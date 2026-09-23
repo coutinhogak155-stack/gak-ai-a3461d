@@ -5,7 +5,7 @@
 <div class="input-area"><button id="plusBtn" onclick="document.getElementById('photoInput').click()">+</button><input id="userInput" placeholder="Ask..." onkeypress="if(event.key==='Enter')send()"><button id="sendBtn" onclick="send()">Send</button></div>
 <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handleFile(this)"><div id="filePreview"></div></div>
 <script>
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "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";//
 let attachedBase64 = null;
 function handleFile(input){const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{attachedBase64=e.target.result;document.getElementById('filePreview').innerHTML=`<img src="${e.target.result}" class="preview"> <span onclick="clearFile()" style="color:red">X</span>`;};r.readAsDataURL(file);}
 function clearFile(){attachedBase64=null;document.getElementById('filePreview').innerHTML='';document.getElementById('photoInput').value='';}
