@@ -1,77 +1,129 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>GAK AI - South Sudan</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAK AI</title>
 <style>
-body{font-family:Arial;background:#0f172a;color:white;padding:20px}
-#chat{max-width:700px;margin:auto;background:#1e293b;padding:20px;border-radius:15px}
-input{width:70%;padding:12px;border-radius:10px;border:none}
-button{padding:12px;border-radius:10px;background:#3b82f6;color:white;border:none;cursor:pointer}
-img,video{width:100%;border-radius:10px;margin-top:10px}
-canvas{background:white;border-radius:10px;margin-top:10px;padding:10px}
+body{background:#0f172a;color:white;font-family:sans-serif;display:flex;justify-content:center;padding:10px;margin:0}
+.container{width:100%;max-width:600px;background:#1e293b;border-radius:15px;padding:15px;min-height:90vh;display:flex;flex-direction:column}
+#chatBox{flex:1;height:450px;overflow-y:auto;background:#0f172a;border-radius:10px;padding:15px;margin:15px 0}
+.msg{margin:12px 0;line-height:1.5}
+.user{color:#60a5fa;font-weight:bold}
+.ai{color:#4ade80;white-space:pre-wrap}
+.preview{max-width:200px;border-radius:10px;margin:5px 0}
+.input-area{display:flex;gap:8px;align-items:center;background:#0f172a;padding:10px;border-radius:25px}
+#plusBtn{background:#2d3748;border:none;color:white;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer}
+input{flex:1;padding:12px;border-radius:20px;border:none;outline:none;background:transparent;color:white}
+#sendBtn{background:#3b82f6;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold;cursor:pointer}
+.upload-menu{position:absolute;bottom:80px;left:20px;background:#2d3748;border-radius:15px;padding:10px;display:none;flex-direction:column;gap:5px;z-index:10}
+.upload-menu button{background:#1e293b;border:none;color:white;padding:12px 20px;border-radius:10px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center}
 </style>
 </head>
 <body>
-<div id="chat">
+<div class="container">
 <h2>🇸🇸 GAK AI</h2>
-<div id="chatBox" style="height:450px;overflow:auto;border:1px solid #334155;padding:10px;border-radius:10px;margin-bottom:10px"></div>
-<input id="userInput" placeholder="Ask, generate image, video, chart..." />
-<button onclick="send()">Send</button>
+<div id="chatBox"><div class="msg ai">Hello! I am GAK AI. Upload photo/video and ask me about it!</div></div>
+
+<div style="position:relative">
+<div id="uploadMenu" class="upload-menu">
+<button onclick="document.getElementById('cameraInput').click()">📷 Camera</button>
+<button onclick="document.getElementById('photoInput').click()">🖼️ Photos</button>
+<button onclick="document.getElementById('fileInput').click()">📎 Files</button>
 </div>
+<div class="input-area">
+<button id="plusBtn" onclick="toggleMenu()">+</button>
+<input id="userInput" placeholder="Ask, upload image, video..." onkeypress="if(event.key==='Enter')send()">
+<button id="sendBtn" onclick="send()">Send</button>
+</div>
+</div>
+
+<input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" style="display:none" onchange="handleFile(this)">
+<input type="file" id="photoInput" accept="image/*,video/*" style="display:none" onchange="handleFile(this)">
+<input type="file" id="fileInput" accept="*/*" style="display:none" onchange="handleFile(this)">
+<div id="filePreview"></div>
+</div>
+
 <script>
-// >>> PUT YOUR GROQ KEY HERE <<<
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "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";
+let attachedFile = null;
+let attachedBase64 = null;
 
-const chatBox = document.getElementById('chatBox');
+function toggleMenu(){
+ const m = document.getElementById('uploadMenu');
+ m.style.display = m.style.display==='flex'?'none':'flex';
+}
+
+function handleFile(input){
+ const file = input.files[0];
+ if(!file) return;
+ attachedFile = file;
+ document.getElementById('uploadMenu').style.display='none';
+ const preview = document.getElementById('filePreview');
+ if(file.type.startsWith('image/')){
+   const reader = new FileReader();
+   reader.onload = e => {
+     attachedBase64 = e.target.result;
+     preview.innerHTML = `<img src="${e.target.result}" class="preview"><br><small>${file.name} <span onclick="clearFile()" style="color:red;cursor:pointer">X Remove</span></small>`;
+   };
+   reader.readAsDataURL(file);
+ }else{
+   preview.innerHTML = `<small>📎 ${file.name} (${(file.size/1024).toFixed(1)}KB) <span onclick="clearFile()" style="color:red;cursor:pointer">X Remove</span></small>`;
+ }
+}
+
+function clearFile(){
+ attachedFile=null; attachedBase64=null;
+ document.getElementById('filePreview').innerHTML='';
+ document.getElementById('cameraInput').value='';
+ document.getElementById('photoInput').value='';
+ document.getElementById('fileInput').value='';
+}
+
 async function send(){
- const msg = document.getElementById('userInput').value.trim();
- if(!msg) return;
- chatBox.innerHTML += `<p><b>You:</b> ${msg}</p>`;
- document.getElementById('userInput').value="";
- chatBox.innerHTML += `<p id="load"><i>GAK AI thinking...</i></p>`;
- const lower = msg.toLowerCase();
+ const input = document.getElementById('userInput');
+ const box = document.getElementById('chatBox');
+ const text = input.value.trim();
+ if(!text &&!attachedFile) return;
 
- // 1. IMAGE
- if(lower.includes("generate image")||lower.includes("create image")||lower.startsWith("draw ")){
-  const prompt = msg.replace(/generate image|create image|draw/gi,"").trim();
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&model=flux&nologo=true&seed=${Math.floor(Math.random()*9999)}`;
-  document.getElementById("load").remove();
-  chatBox.innerHTML += `<p><b>GAK AI:</b> Image for "${prompt}"</p><img src="${url}">`;
-  return;
- }
- // 2. VIDEO
- if(lower.includes("generate video")||lower.includes("create video")){
-  const prompt = msg.replace(/generate video|create video/gi,"").trim();
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?model=video`;
-  document.getElementById("load").remove();
-  chatBox.innerHTML += `<p><b>GAK AI:</b> Video for "${prompt}"</p><video controls autoplay loop muted><source src="${url}" type="video/mp4"></video>`;
-  return;
- }
- // 3. CHART
- if(lower.includes("chart")||lower.includes("graph")||lower.includes("plot")){
-  document.getElementById("load").remove();
-  const id = "chart"+Date.now();
-  chatBox.innerHTML += `<p><b>GAK AI:</b> Chart</p><canvas id="${id}"></canvas>`;
-  setTimeout(()=>{ new Chart(document.getElementById(id),{type:'bar',data:{labels:['Juba','Wau','Malakal','Bor','Yei','Yambio'],datasets:[{label:'Population Example',data:[12,19,8,15,11,9],backgroundColor:'#3b82f6'}]}})},300);
-  return;
- }
+ let displayText = text;
+ if(attachedFile) displayText = `[Attached: ${attachedFile.name}] ` + displayText;
+ box.innerHTML += `<div class="msg user">You: ${displayText}</div>`;
+ if(attachedBase64) box.innerHTML += `<img src="${attachedBase64}" class="preview">`;
 
- // 4. CHAT WITH GROQ
+ input.value='';
+ const loadingId = 'load'+Date.now();
+ box.innerHTML += `<div class="msg ai" id="${loadingId}">GAK AI: Thinking...</div>`;
+ box.scrollTop = box.scrollHeight;
+
  try{
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
-   method:"POST",
-   headers:{"Authorization":`Bearer ${GROQ_API_KEY}`,"Content-Type":"application/json"},
-   body:JSON.stringify({model:"llama-3.1-8b-instant",messages:[{role:"system",content:"You are GAK AI from South Sudan by Isaiah Gak."},{role:"user",content:msg}]})
-  });
-  const data = await res.json();
-  document.getElementById("load").remove();
-  chatBox.innerHTML += `<p><b>GAK AI:</b> ${data.choices[0].message.content}</p>`;
+   let messages = [];
+   if(attachedBase64){
+     messages.push({role:'user', content:[
+       {type:'text', text: text || 'What is in this image?'},
+       {type:'image_url', image_url:{url: attachedBase64}}
+     ]});
+   }else{
+     messages.push({role:'user', content: text});
+   }
+
+   const model = attachedBase64? 'llama-3.2-11b-vision-preview' : 'llama-3.1-8b-instant';
+
+   const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+     method:'POST',
+     headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_API_KEY}`},
+     body: JSON.stringify({model: model, messages: messages})
+   });
+   const data = await res.json();
+   document.getElementById(loadingId).remove();
+   if(data.error){ box.innerHTML += `<div class="msg ai">Error: ${data.error.message}</div>`; }
+   else{ box.innerHTML += `<div class="msg ai">GAK AI: ${data.choices[0].message.content}</div>`; }
  }catch(e){
-  document.getElementById("load").remove();
-  chatBox.innerHTML += `<p style="color:red">Error: Check API key - ${e.message}</p>`;
+   document.getElementById(loadingId).remove();
+   box.innerHTML += `<div class="msg ai">Error: ${e.message} - Check internet & API key</div>`;
  }
+ clearFile();
+ box.scrollTop = box.scrollHeight;
 }
 </script>
 </body>
