@@ -1,130 +1,18 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GAK AI</title>
-<style>
-body{background:#0f172a;color:white;font-family:sans-serif;display:flex;justify-content:center;padding:10px;margin:0}
-.container{width:100%;max-width:600px;background:#1e293b;border-radius:15px;padding:15px;min-height:90vh;display:flex;flex-direction:column}
-#chatBox{flex:1;height:450px;overflow-y:auto;background:#0f172a;border-radius:10px;padding:15px;margin:15px 0}
-.msg{margin:12px 0;line-height:1.5}
-.user{color:#60a5fa;font-weight:bold}
-.ai{color:#4ade80;white-space:pre-wrap}
-.preview{max-width:200px;border-radius:10px;margin:5px 0}
-.input-area{display:flex;gap:8px;align-items:center;background:#0f172a;padding:10px;border-radius:25px}
-#plusBtn{background:#2d3748;border:none;color:white;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer}
-input{flex:1;padding:12px;border-radius:20px;border:none;outline:none;background:transparent;color:white}
-#sendBtn{background:#3b82f6;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold;cursor:pointer}
-.upload-menu{position:absolute;bottom:80px;left:20px;background:#2d3748;border-radius:15px;padding:10px;display:none;flex-direction:column;gap:5px;z-index:10}
-.upload-menu button{background:#1e293b;border:none;color:white;padding:12px 20px;border-radius:10px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center}
-</style>
-</head>
-<body>
-<div class="container">
-<h2>🇸🇸 GAK AI</h2>
-<div id="chatBox"><div class="msg ai">Hello! I am GAK AI. Upload photo/video and ask me about it!</div></div>
-
-<div style="position:relative">
-<div id="uploadMenu" class="upload-menu">
-<button onclick="document.getElementById('cameraInput').click()">📷 Camera</button>
-<button onclick="document.getElementById('photoInput').click()">🖼️ Photos</button>
-<button onclick="document.getElementById('fileInput').click()">📎 Files</button>
-</div>
-<div class="input-area">
-<button id="plusBtn" onclick="toggleMenu()">+</button>
-<input id="userInput" placeholder="Ask, upload image, video..." onkeypress="if(event.key==='Enter')send()">
-<button id="sendBtn" onclick="send()">Send</button>
-</div>
-</div>
-
-<input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" style="display:none" onchange="handleFile(this)">
-<input type="file" id="photoInput" accept="image/*,video/*" style="display:none" onchange="handleFile(this)">
-<input type="file" id="fileInput" accept="*/*" style="display:none" onchange="handleFile(this)">
-<div id="filePreview"></div>
-</div>
-
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>GAK AI</title>
+<style>body{background:#0f172a;color:white;font-family:sans-serif;display:flex;justify-content:center;padding:10px;margin:0}.container{width:100%;max-width:600px;background:#1e293b;border-radius:15px;padding:15px;min-height:90vh;display:flex;flex-direction:column}#chatBox{flex:1;height:450px;overflow-y:auto;background:#0f172a;border-radius:10px;padding:15px;margin:15px 0}.msg{margin:12px 0}.user{color:#60a5fa;font-weight:bold}.ai{color:#4ade80;white-space:pre-wrap}.preview{max-width:200px;border-radius:10px}.input-area{display:flex;gap:8px;align-items:center;background:#0f172a;padding:10px;border-radius:25px}input{flex:1;padding:12px;border-radius:20px;border:none;outline:none;background:transparent;color:white}#plusBtn{background:#2d3748;border:none;color:white;font-size:22px;width:40px;height:40px;border-radius:50%}#sendBtn{background:#3b82f6;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold}</style></head>
+<body><div class="container"><h2>🇸🇸 GAK AI</h2><div id="chatBox"><div class="msg ai">Hello! I am GAK AI.</div></div>
+<div class="input-area"><button id="plusBtn" onclick="document.getElementById('photoInput').click()">+</button><input id="userInput" placeholder="Ask..." onkeypress="if(event.key==='Enter')send()"><button id="sendBtn" onclick="send()">Send</button></div>
+<input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handleFile(this)"><div id="filePreview"></div></div>
 <script>
-const GROQ_API_KEY = "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";
-let attachedFile = null;
+const GROQ_API_KEY = "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";
 let attachedBase64 = null;
-
-function toggleMenu(){
- const m = document.getElementById('uploadMenu');
- m.style.display = m.style.display==='flex'?'none':'flex';
-}
-
-function handleFile(input){
- const file = input.files[0];
- if(!file) return;
- attachedFile = file;
- document.getElementById('uploadMenu').style.display='none';
- const preview = document.getElementById('filePreview');
- if(file.type.startsWith('image/')){
-   const reader = new FileReader();
-   reader.onload = e => {
-     attachedBase64 = e.target.result;
-     preview.innerHTML = `<img src="${e.target.result}" class="preview"><br><small>${file.name} <span onclick="clearFile()" style="color:red;cursor:pointer">X Remove</span></small>`;
-   };
-   reader.readAsDataURL(file);
- }else{
-   preview.innerHTML = `<small>📎 ${file.name} (${(file.size/1024).toFixed(1)}KB) <span onclick="clearFile()" style="color:red;cursor:pointer">X Remove</span></small>`;
- }
-}
-
-function clearFile(){
- attachedFile=null; attachedBase64=null;
- document.getElementById('filePreview').innerHTML='';
- document.getElementById('cameraInput').value='';
- document.getElementById('photoInput').value='';
- document.getElementById('fileInput').value='';
-}
-
-async function send(){
- const input = document.getElementById('userInput');
- const box = document.getElementById('chatBox');
- const text = input.value.trim();
- if(!text &&!attachedFile) return;
-
- let displayText = text;
- if(attachedFile) displayText = `[Attached: ${attachedFile.name}] ` + displayText;
- box.innerHTML += `<div class="msg user">You: ${displayText}</div>`;
- if(attachedBase64) box.innerHTML += `<img src="${attachedBase64}" class="preview">`;
-
- input.value='';
- const loadingId = 'load'+Date.now();
- box.innerHTML += `<div class="msg ai" id="${loadingId}">GAK AI: Thinking...</div>`;
- box.scrollTop = box.scrollHeight;
-
- try{
-   let messages = [];
-   if(attachedBase64){
-     messages.push({role:'user', content:[
-       {type:'text', text: text || 'What is in this image?'},
-       {type:'image_url', image_url:{url: attachedBase64}}
-     ]});
-   }else{
-     messages.push({role:'user', content: text});
-   }
-
-   const model = attachedBase64? 'meta-llama/llama-4-scout-17b-16e-instruct' : 'llama-3.3-70b-versatile';
-
-   const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{
-     method:'POST',
-     headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_API_KEY}`},
-     body: JSON.stringify({model: model, messages: messages})
-   });
-   const data = await res.json();
-   document.getElementById(loadingId).remove();
-   if(data.error){ box.innerHTML += `<div class="msg ai">Error: ${data.error.message}</div>`; }
-   else{ box.innerHTML += `<div class="msg ai">GAK AI: ${data.choices[0].message.content}</div>`; }
- }catch(e){
-   document.getElementById(loadingId).remove();
-   box.innerHTML += `<div class="msg ai">Error: ${e.message} - Check internet & API key</div>`;
- }
- clearFile();
- box.scrollTop = box.scrollHeight;
-}
-</script>
-</body>
-</html>
+function handleFile(input){const file=input.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{attachedBase64=e.target.result;document.getElementById('filePreview').innerHTML=`<img src="${e.target.result}" class="preview"> <span onclick="clearFile()" style="color:red">X</span>`;};r.readAsDataURL(file);}
+function clearFile(){attachedBase64=null;document.getElementById('filePreview').innerHTML='';document.getElementById('photoInput').value='';}
+async function send(){const input=document.getElementById('userInput');const box=document.getElementById('chatBox');const text=input.value.trim();if(!text&&!attachedBase64)return;box.innerHTML+=`<div class="msg user">You: ${text}</div>`;if(attachedBase64)box.innerHTML+=`<img src="${attachedBase64}" class="preview">`;input.value='';const id='l'+Date.now();box.innerHTML+=`<div class="msg ai" id="${id}">Thinking...</div>`;box.scrollTop=box.scrollHeight;
+const models = attachedBase64? ['meta-llama/llama-4-scout-17b-16e-instruct','llama-3.2-11b-vision-preview'] : ['llama-3.1-8b-instant','llama3-8b-8192','llama-3.3-70b-versatile','gemma2-9b-it'];
+let success=false;
+for(const model of models){try{const body=attachedBase64?{model:model,messages:[{role:'user',content:[{type:'text',text:text||'describe'},{type:'image_url',image_url:{url:attachedBase64}}]}]}:{model:model,messages:[{role:'user',content:text}]};const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_API_KEY},body:JSON.stringify(body)});const data=await res.json();if(data.error){console.log('Model',model,'failed:',data.error.message);if(models.indexOf(model)==models.length-1){document.getElementById(id).innerText='Error: '+data.error.message+' (Key invalid? Check console.groq.com)';}continue;}else{document.getElementById(id).innerText='GAK AI: '+data.choices[0].message.content;success=true;break;}}catch(e){console.log(e);}}
+if(!success&&document.getElementById(id).innerText.includes('Thinking')){document.getElementById(id).innerText='Failed. Check API key at console.groq.com/keys';}
+clearFile();box.scrollTop=box.scrollHeight;}
+</script></body></html>
