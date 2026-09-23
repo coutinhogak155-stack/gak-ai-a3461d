@@ -3,127 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GAK AI</title>
+<title>GAK AI - Chat + Image + Video</title>
 <style>
-body{background:#0f172a;color:white;font-family:sans-serif;display:flex;justify-content:center;padding:10px;margin:0}
-.container{width:100%;max-width:600px;background:#1e293b;border-radius:15px;padding:15px;min-height:90vh;display:flex;flex-direction:column}
-#chatBox{flex:1;height:450px;overflow-y:auto;background:#0f172a;border-radius:10px;padding:15px;margin:15px 0}
-.msg{margin:12px 0;line-height:1.5}
-.user{color:#60a5fa;font-weight:bold}
-.ai{color:#4ade80;white-space:pre-wrap}
-.preview{max-width:200px;border-radius:10px;margin:5px 0}
-.input-area{display:flex;gap:8px;align-items:center;background:#0f172a;padding:10px;border-radius:25px}
-#plusBtn{background:#2d3748;border:none;color:white;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer}
-input{flex:1;padding:12px;border-radius:20px;border:none;outline:none;background:transparent;color:white}
-#sendBtn{background:#3b82f6;color:white;border:none;padding:12px 20px;border-radius:20px;font-weight:bold;cursor:pointer}
-.upload-menu{position:absolute;bottom:80px;left:20px;background:#2d3748;border-radius:15px;padding:10px;display:none;flex-direction:column;gap:5px;z-index:10}
-.upload-menu button{background:#1e293b;border:none;color:white;padding:12px 20px;border-radius:10px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center}
+body{background:#0f172a;color:white;font-family:sans-serif;margin:0;padding:0}
+#box{padding:15px;padding-bottom:80px;max-width:700px;margin:auto}
+.msg{background:#1e293b;padding:12px;border-radius:12px;margin:10px 0;word-wrap:break-word}
+.msg.ai{border-left:4px solid #22c55e}
+#inputArea{position:fixed;bottom:0;left:0;right:0;background:#0f172a;padding:10px;display:flex;gap:8px}
+input{flex:1;padding:12px;border-radius:20px;border:none;outline:none}
+button{padding:12px 18px;border-radius:20px;border:none;background:#22c55e;color:white;font-weight:bold}
+img.gen{width:100%;border-radius:12px;margin-top:10px}
+video.gen{width:100%;border-radius:12px;margin-top:10px}
 </style>
 </head>
 <body>
-<div class="container">
-<h2>🇸🇸 GAK AI</h2>
-<div id="chatBox"><div class="msg ai">Hello! I am GAK AI. Upload photo/video and ask me about it!</div></div>
-
-<div style="position:relative">
-<div id="uploadMenu" class="upload-menu">
-<button onclick="document.getElementById('cameraInput').click()">📷 Camera</button>
-<button onclick="document.getElementById('photoInput').click()">🖼️ Photos</button>
-<button onclick="document.getElementById('fileInput').click()">📎 Files</button>
-</div>
-<div class="input-area">
-<button id="plusBtn" onclick="toggleMenu()">+</button>
-<input id="userInput" placeholder="Ask, upload image, video..." onkeypress="if(event.key==='Enter')send()">
-<button id="sendBtn" onclick="send()">Send</button>
-</div>
-</div>
-
-<input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" style="display:none" onchange="handleFile(this)">
-<input type="file" id="photoInput" accept="image/*,video/*" style="display:none" onchange="handleFile(this)">
-<input type="file" id="fileInput" accept="*/*" style="display:none" onchange="handleFile(this)">
-<div id="filePreview"></div>
-</div>
+<div id="box"><div class="msg ai">GAK AI is ready! Try:<br>1. hi<br>2. generate image of a lion in Juba<br>3. generate video of a car driving</div></div>
+<div id="inputArea"><input id="text" placeholder="Type here..." onkeydown="if(event.key==='Enter')send()"><button onclick="send()">Send</button></div>
 
 <script>
-const GROQ_API_KEY = "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";//
-let attachedFile = null;
-let attachedBase64 = null;
+const GROQ_KEY = <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAK AI - Chat + Image + Video</title>
+<style>
+body{background:#0f172a;color:white;font-family:sans-serif;margin:0;padding:0}
+#box{padding:15px;padding-bottom:80px;max-width:700px;margin:auto}
+.msg{background:#1e293b;padding:12px;border-radius:12px;margin:10px 0;word-wrap:break-word}
+.msg.ai{border-left:4px solid #22c55e}
+#inputArea{position:fixed;bottom:0;left:0;right:0;background:#0f172a;padding:10px;display:flex;gap:8px}
+input{flex:1;padding:12px;border-radius:20px;border:none;outline:none}
+button{padding:12px 18px;border-radius:20px;border:none;background:#22c55e;color:white;font-weight:bold}
+img.gen{width:100%;border-radius:12px;margin-top:10px}
+video.gen{width:100%;border-radius:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="box"><div class="msg ai">GAK AI is ready! Try:<br>1. hi<br>2. generate image of a lion in Juba<br>3. generate video of a car driving</div></div>
+<div id="inputArea"><input id="text" placeholder="Type here..." onkeydown="if(event.key==='Enter')send()"><button onclick="send()">Send</button></div>
 
-function toggleMenu(){
- const m = document.getElementById('uploadMenu');
- m.style.display = m.style.display==='flex'?'none':'flex';
-}
-
-function handleFile(input){
- const file = input.files[0];
- if(!file) return;
- attachedFile = file;
- document.getElementById('uploadMenu').style.display='none';
- const preview = document.getElementById('filePreview');
- if(file.type.startsWith('image/')){
-   const reader = new FileReader();
-   reader.onload = e => {
-     attachedBase64 = e.target.result;
-     preview.innerHTML = `<img src="${e.target.result}" class="preview"><br><small>${file.name} <span onclick="clearFile()" style="color:red;cursor:pointer">X Remove</span></small>`;
-   };
-   reader.readAsDataURL(file);
- }else{
-   preview.innerHTML = `<small>📎 ${file.name} (${(file.size/1024).toFixed(1)}KB) <span onclick="clearFile()" style="color:red;cursor:pointer">X Remove</span></small>`;
- }
-}
-
-function clearFile(){
- attachedFile=null; attachedBase64=null;
- document.getElementById('filePreview').innerHTML='';
- document.getElementById('cameraInput').value='';
- document.getElementById('photoInput').value='';
- document.getElementById('fileInput').value='';
-}
+<script>
+const GROQ_KEY = "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";//
 
 async function send(){
- const input = document.getElementById('userInput');
- const box = document.getElementById('chatBox');
- const text = input.value.trim();
- if(!text &&!attachedFile) return;
+ let text = document.getElementById("text").value.trim();
+ if(!text) return;
+ let box = document.getElementById("box");
+ box.innerHTML += `<div class="msg">You: ${text}</div>`;
+ document.getElementById("text").value = "";
+ let loadingId = "load"+Date.now();
+ box.innerHTML += `<div class="msg ai" id="${loadingId}">Thinking...</div>`;
+ window.scrollTo(0,document.body.scrollHeight);
 
- let displayText = text;
- if(attachedFile) displayText = `[Attached: ${attachedFile.name}] ` + displayText;
- box.innerHTML += `<div class="msg user">You: ${displayText}</div>`;
- if(attachedBase64) box.innerHTML += `<img src="${attachedBase64}" class="preview">`;
+ let lower = text.toLowerCase();
 
- input.value='';
- const loadingId = 'load'+Date.now();
- box.innerHTML += `<div class="msg ai" id="${loadingId}">GAK AI: Thinking...</div>`;
- box.scrollTop = box.scrollHeight;
-
- try{
-   let messages = [];
-   if(attachedBase64){
-     messages.push({role:'user', content:[
-       {type:'text', text: text || 'What is in this image?'},
-       {type:'image_url', image_url:{url: attachedBase64}}
-     ]});
-   }else{
-     messages.push({role:'user', content: text});
-   }
-
-   const model = attachedBase64? 'meta-llama/llama-4-maverick-17b-128e-instruct' : 'openai/gpt-oss-20b';
-
-   const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{
-     method:'POST',
-     headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_API_KEY}`},
-     body: JSON.stringify({model: model, messages: messages})
-   });
-   const data = await res.json();
+ // --- 1. IMAGE GENERATION (FREE, NO KEY) ---
+ if(lower.includes("generate") && (lower.includes("image")||lower.includes("photo")||lower.includes("picture")||lower.includes("draw"))){
+   let prompt = text.replace(/generate/gi,'').replace(/image/gi,'').replace(/photo/gi,'').replace(/picture/gi,'').replace(/draw/gi,'').replace(/of/gi,'').trim();
+   if(prompt.length<2) prompt = "beautiful landscape";
+   let seed = Math.floor(Math.random()*999999);
+   let imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=768&seed=${seed}&nologo=true&enhance=true`;
    document.getElementById(loadingId).remove();
-   if(data.error){ box.innerHTML += `<div class="msg ai">Error: ${data.error.message}</div>`; }
-   else{ box.innerHTML += `<div class="msg ai">GAK AI: ${data.choices[0].message.content}</div>`; }
+   box.innerHTML += `<div class="msg ai">Generated Image:<br><img class="gen" src="${imgUrl}" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>Prompt: ${prompt}</small></div>`;
+   return;
+ }
+
+ // --- 2. VIDEO GENERATION (FREE, NO KEY) ---
+ if(lower.includes("generate") && lower.includes("video")){
+   let prompt = text.replace(/generate/gi,'').replace(/video/gi,'').replace(/of/gi,'').trim();
+   if(prompt.length<2) prompt = "a cinematic nature clip";
+   document.getElementById(loadingId).innerHTML = "Generating video... this takes 15-30 seconds...";
+   // Using Pollinations video model + fallback to animated image
+   let seed = Math.floor(Math.random()*999999);
+   // Pollinations supports video via same endpoint with model=video - we use an mp4 proxy
+   let videoUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + " video, motion, cinematic")}?width=512&height=512&seed=${seed}&nologo=true&model=turbo`;
+   // For real mp4 video generation (free tier):
+   let mp4Url = `https://gen.pollinations.ai/video/${encodeURIComponent(prompt)}?seed=${seed}`;
+   document.getElementById(loadingId).remove();
+   box.innerHTML += `<div class="msg ai">Generated Video (preview):<br>
+   <video class="gen" controls autoplay loop muted playsinline><source src="${mp4Url}" type="video/mp4"></video>
+   <img class="gen" src="${videoUrl}" style="margin-top:8px">
+   <br><small>Prompt: ${prompt}</small><br>
+   <small>If video doesn't play, it will show as moving image. Video AI is still new free tech.</small></div>`;
+   return;
+ }
+
+ // --- 3. NORMAL CHAT (Groq) ---
+ try{
+   const model = 'openai/gpt-oss-20b';
+   let res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+     method:"POST",
+     headers:{"Content-Type":"application/json","Authorization":"Bearer "+GROQ_KEY},
+     body: JSON.stringify({model:model, messages:[{role:"user", content:text}]})
+   });
+   let data = await res.json();
+   document.getElementById(loadingId).remove();
+   if(data.error){ box.innerHTML += `<div class="msg ai">Error: ${data.error.message}</div>`; return; }
+   let reply = data.choices[0].message.content;
+   box.innerHTML += `<div class="msg ai">GAK AI: ${reply}</div>`;
+   window.scrollTo(0,document.body.scrollHeight);
  }catch(e){
    document.getElementById(loadingId).remove();
-   box.innerHTML += `<div class="msg ai">Error: ${e.message} - Check internet & API key</div>`;
+   box.innerHTML += `<div class="msg ai">Error: ${e.message}. Check your GROQ_KEY.</div>`;
  }
- clearFile();
- box.scrollTop = box.scrollHeight;
+}
+</script>
+</body>
+</html>
+
+async function send(){
+ let text = document.getElementById("text").value.trim();
+ if(!text) return;
+ let box = document.getElementById("box");
+ box.innerHTML += `<div class="msg">You: ${text}</div>`;
+ document.getElementById("text").value = "";
+ let loadingId = "load"+Date.now();
+ box.innerHTML += `<div class="msg ai" id="${loadingId}">Thinking...</div>`;
+ window.scrollTo(0,document.body.scrollHeight);
+
+ let lower = text.toLowerCase();
+
+ // --- 1. IMAGE GENERATION (FREE, NO KEY) ---
+ if(lower.includes("generate") && (lower.includes("image")||lower.includes("photo")||lower.includes("picture")||lower.includes("draw"))){
+   let prompt = text.replace(/generate/gi,'').replace(/image/gi,'').replace(/photo/gi,'').replace(/picture/gi,'').replace(/draw/gi,'').replace(/of/gi,'').trim();
+   if(prompt.length<2) prompt = "beautiful landscape";
+   let seed = Math.floor(Math.random()*999999);
+   let imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=768&seed=${seed}&nologo=true&enhance=true`;
+   document.getElementById(loadingId).remove();
+   box.innerHTML += `<div class="msg ai">Generated Image:<br><img class="gen" src="${imgUrl}" onload="window.scrollTo(0,document.body.scrollHeight)"><br><small>Prompt: ${prompt}</small></div>`;
+   return;
+ }
+
+ // --- 2. VIDEO GENERATION (FREE, NO KEY) ---
+ if(lower.includes("generate") && lower.includes("video")){
+   let prompt = text.replace(/generate/gi,'').replace(/video/gi,'').replace(/of/gi,'').trim();
+   if(prompt.length<2) prompt = "a cinematic nature clip";
+   document.getElementById(loadingId).innerHTML = "Generating video... this takes 15-30 seconds...";
+   // Using Pollinations video model + fallback to animated image
+   let seed = Math.floor(Math.random()*999999);
+   // Pollinations supports video via same endpoint with model=video - we use an mp4 proxy
+   let videoUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + " video, motion, cinematic")}?width=512&height=512&seed=${seed}&nologo=true&model=turbo`;
+   // For real mp4 video generation (free tier):
+   let mp4Url = `https://gen.pollinations.ai/video/${encodeURIComponent(prompt)}?seed=${seed}`;
+   document.getElementById(loadingId).remove();
+   box.innerHTML += `<div class="msg ai">Generated Video (preview):<br>
+   <video class="gen" controls autoplay loop muted playsinline><source src="${mp4Url}" type="video/mp4"></video>
+   <img class="gen" src="${videoUrl}" style="margin-top:8px">
+   <br><small>Prompt: ${prompt}</small><br>
+   <small>If video doesn't play, it will show as moving image. Video AI is still new free tech.</small></div>`;
+   return;
+ }
+
+ // --- 3. NORMAL CHAT (Groq) ---
+ try{
+   const model = 'openai/gpt-oss-20b';
+   let res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+     method:"POST",
+     headers:{"Content-Type":"application/json","Authorization":"Bearer "+GROQ_KEY},
+     body: JSON.stringify({model:model, messages:[{role:"user", content:text}]})
+   });
+   let data = await res.json();
+   document.getElementById(loadingId).remove();
+   if(data.error){ box.innerHTML += `<div class="msg ai">Error: ${data.error.message}</div>`; return; }
+   let reply = data.choices[0].message.content;
+   box.innerHTML += `<div class="msg ai">GAK AI: ${reply}</div>`;
+   window.scrollTo(0,document.body.scrollHeight);
+ }catch(e){
+   document.getElementById(loadingId).remove();
+   box.innerHTML += `<div class="msg ai">Error: ${e.message}. Check your GROQ_KEY.</div>`;
+ }
 }
 </script>
 </body>
