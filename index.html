@@ -762,7 +762,7 @@
                 const temperature = parseFloat(localStorage.getItem('gak_temperature') || '0.7');
 
                 const apiPayload = {
-                    model: currentModel,
+                    model: model: "openai/gpt-oss-20b",
                     messages: [
                         { role: 'system', content: systemPrompt },
                         ...messages.filter(m => !m.loading && m.content).map(m => ({ role: m.role, content: m.content }))
