@@ -1,997 +1,139 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAK AI Interface</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkbg: '#0F1117',
-                        darksidebar: '#161922',
-                        darkcard: '#1E2330',
-                        darkborder: '#2A3042',
-                        brand: {
-                            500: '#6366F1',
-                            600: '#4F46E5',
-                            700: '#4338CA'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2A3042; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3B4252; }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAK AI - By Isaiah Gak</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:'class',theme:{extend:{colors:{darkbg:'#0F1117',darksidebar:'#161922',darkcard:'#1E2330',darkborder:'#2A3042'}}}}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>body{font-family:Inter,sans-serif}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#2A3042;border-radius:3px}</style>
 </head>
-<body class="bg-darkbg text-gray-100 h-screen overflow-hidden flex flex-col">
+<body class="bg-darkbg text-gray-100 h-screen flex flex-col">
+<div class="flex h-full w-full">
+<div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
-    <div id="app" class="flex h-full w-full relative overflow-hidden">
-        
-        <!-- Toast Notification Container -->
-        <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+<aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 bg-darksidebar border-r border-darkborder flex flex-col transition-transform -translate-x-full md:translate-x-0">
+<div class="p-4 border-b border-darkborder flex items-center justify-between">
+<div class="flex items-center space-x-3"><div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center"><i class="fa-solid fa-bolt text-white"></i></div><div><h1 class="font-bold">GAK AI</h1><p class="text-xs text-indigo-400">By Isaiah Gak</p></div></div>
+<button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')" class="md:hidden text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div class="p-3"><button onclick="startNewChat()" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl"><i class="fa-solid fa-plus mr-2"></i>New Chat</button></div>
+<div class="flex-1 overflow-y-auto px-3 py-2">
+<p class="px-3 text-xs text-gray-500 uppercase">History</p><div id="history-list" class="mt-2"></div>
+<div class="mt-6"><p class="px-3 text-xs text-gray-500 uppercase">Settings</p>
+<a href="#" onclick="openSettingsModal()" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white"><i class="fa-solid fa-gear w-5"></i><span>Settings & API Key</span></a>
+</div></div>
+<div class="p-3 border-t border-darkborder"><div class="flex items-center space-x-3 bg-darkcard p-2 rounded-xl"><div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs">GK</div><div><p class="text-sm font-semibold">GAK User</p><p class="text-xs text-emerald-400">GAK AI Active</p></div></div></div>
+</aside>
 
-        <!-- Sidebar (Desktop & Mobile drawer) -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-darksidebar border-r border-darkborder flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:static">
-            <div class="p-4 border-b border-darkborder flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <i class="fa-solid fa-wand-magic-sparkles text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg tracking-wide text-white">GAK AI</h1>
-                        <p class="text-xs text-indigo-400 font-medium">Groq Accelerated</p>
-                    </div>
-                </div>
-                <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-3">
-                <button onclick="startNewChat()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-md transition-all active:scale-95">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>New Chat</span>
-                </button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto px-3 py-2 space-y-6">
-                <!-- Navigation section -->
-                <div class="space-y-1">
-                    <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Navigation</p>
-                    <a href="#" onclick="switchTab('chat')" id="nav-chat" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-darkcard text-white border border-darkborder transition-colors">
-                        <i class="fa-solid fa-comments text-indigo-400 w-5"></i>
-                        <span>Chat Assistant</span>
-                    </a>
-                    <a href="#" onclick="switchTab('studio')" id="nav-studio" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-darkcard/50 transition-colors">
-                        <i class="fa-solid fa-image text-purple-400 w-5"></i>
-                        <span>Image Studio</span>
-                    </a>
-                    <a href="#" onclick="switchTab('gallery')" id="nav-gallery" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-darkcard/50 transition-colors">
-                        <i class="fa-solid fa-photo-film text-pink-400 w-5"></i>
-                        <span>Gallery</span>
-                    </a>
-                    <a href="#" onclick="switchTab('projects')" id="nav-projects" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-darkcard/50 transition-colors">
-                        <i class="fa-solid fa-folder-open text-blue-400 w-5"></i>
-                        <span>Projects</span>
-                    </a>
-                </div>
-
-                <!-- Chat History Section -->
-                <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3">
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Recent History</p>
-                        <button onclick="clearHistory()" class="text-xs text-gray-500 hover:text-red-400 transition-colors" title="Clear History">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
-                    <div id="history-list" class="space-y-1 mt-1">
-                        <!-- Populated dynamically via JS -->
-                    </div>
-                </div>
-
-                <!-- Support & Settings section -->
-                <div class="space-y-1">
-                    <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Preferences</p>
-                    <a href="#" onclick="openSettingsModal()" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-darkcard/50 transition-colors">
-                        <i class="fa-solid fa-gear text-gray-400 w-5"></i>
-                        <span>Settings & API Key</span>
-                    </a>
-                    <a href="#" onclick="openHelpModal()" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-darkcard/50 transition-colors">
-                        <i class="fa-solid fa-circle-question text-gray-400 w-5"></i>
-                        <span>Help & Support</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="p-3 border-t border-darkborder">
-                <div class="flex items-center justify-between p-2 rounded-xl bg-darkcard/50 border border-darkborder/50">
-                    <div class="flex items-center space-x-3 overflow-hidden">
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center font-bold text-white text-sm">
-                            GK
-                        </div>
-                        <div class="overflow-hidden">
-                            <p class="text-sm font-semibold text-white truncate">GAK User</p>
-                            <p class="text-xs text-emerald-400 flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block mr-1.5"></span>Groq Free Tier</p>
-                        </div>
-                    </div>
-                    <button onclick="openSettingsModal()" class="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-darkborder/50">
-                        <i class="fa-solid fa-sliders"></i>
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content Wrapper -->
-        <main class="flex-1 flex flex-col h-full bg-darkbg overflow-hidden relative">
-            
-            <header class="h-16 border-b border-darkborder bg-darksidebar/60 backdrop-blur-md flex items-center justify-between px-4 z-30">
-                <div class="flex items-center space-x-3">
-                    <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2">
-                        <i class="fa-solid fa-bars text-lg"></i>
-                    </button>
-                    <div class="flex items-center space-x-2">
-                        <span id="current-view-title" class="font-semibold text-white text-base">Chat Assistant</span>
-                        <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-medium hidden sm:inline-block">Groq Cloud API</span>
-                    </div>
-                </div>
-
-                <!-- Model Selector & Quick Actions -->
-                <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-2 bg-darkcard border border-darkborder rounded-xl px-3 py-1.5 shadow-inner">
-                        <i class="fa-solid fa-microchip text-indigo-400 text-xs"></i>
-                        <select id="model-select" onchange="changeModel(this.value)" class="bg-transparent text-xs font-medium text-gray-200 focus:outline-none cursor-pointer">
-<option value="openai/gpt-oss-20b">GPT-OSS 20B - Fast & Free ✅</option>
-<option value="openai/gpt-oss-120b">GPT-OSS 120B - Smartest ✅</option>
+<main class="flex-1 flex flex-col bg-darkbg overflow-hidden">
+<header class="h-16 border-b border-darkborder bg-darksidebar/60 backdrop-blur flex items-center justify-between px-4">
+<div class="flex items-center space-x-3"><button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')" class="md:hidden text-gray-400"><i class="fa-solid fa-bars"></i></button><span class="font-semibold">Chat Assistant</span><span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">GAK AI</span></div>
+<div class="flex items-center space-x-2">
+<div class="bg-darkcard border border-darkborder rounded-xl px-3 py-1.5 flex items-center"><i class="fa-solid fa-bolt text-indigo-400 text-xs mr-2"></i>
+<select id="model-select" onchange="changeModel(this.value)" class="bg-transparent text-xs text-gray-200 focus:outline-none">
+<option value="openai/gpt-oss-20b" selected>GPT-OSS 20B - Fast ✅</option>
+<option value="openai/gpt-oss-120b">GPT-OSS 120B - Smart ✅</option>
 <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant</option>
-<option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</option>
 <option value="qwen/qwen3-32b">Qwen 3 32B</option>
-                        </select>
-                    </div>
-                    <button onclick="openSettingsModal()" class="flex items-center space-x-1.5 bg-darkcard hover:bg-darkborder border border-darkborder text-xs font-medium px-3 py-1.5 rounded-xl transition-colors">
-                        <i class="fa-solid fa-key text-amber-400"></i>
-                        <span class="hidden sm:inline">API Key</span>
-                    </button>
-                </div>
-            </header>
-
-            <div id="view-chat" class="flex-1 flex flex-col overflow-hidden relative">
-                <!-- Chat Messages Scroll Container -->
-                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
-                    <!-- Welcome Hero Banner -->
-                    <div id="welcome-banner" class="max-w-2xl mx-auto text-center py-12 px-4 space-y-6">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 mx-auto flex items-center justify-center shadow-xl shadow-indigo-500/20 text-2xl text-white">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                        <div class="space-y-2">
-                            <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">How can GAK AI help you today?</h2>
-                            <p class="text-sm text-gray-400 max-w-lg mx-auto">Lightning-fast LLM responses powered directly by the Groq API. Select a model, type a prompt, or try one of the suggestions below.</p>
-                        </div>
-                        
-                        <!-- Quick Prompt Suggestions -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 text-left">
-                            <button onclick="sendPresetPrompt('Explain quantum computing in simple terms')" class="p-3.5 rounded-xl bg-darkcard hover:bg-darkcard/80 border border-darkborder transition-all flex items-start space-x-3 group">
-                                <i class="fa-solid fa-atom text-indigo-400 mt-0.5 group-hover:scale-110 transition-transform"></i>
-                                <div>
-                                    <p class="text-xs font-semibold text-white">Quantum Computing</p>
-                                    <p class="text-xs text-gray-400">Explain in simple terms</p>
-                                </div>
-                            </button>
-                            <button onclick="sendPresetPrompt('Write a Python script for web scraping with BeautifulSoup')" class="p-3.5 rounded-xl bg-darkcard hover:bg-darkcard/80 border border-darkborder transition-all flex items-start space-x-3 group">
-                                <i class="fa-solid fa-code text-purple-400 mt-0.5 group-hover:scale-110 transition-transform"></i>
-                                <div>
-                                    <p class="text-xs font-semibold text-white">Python Web Scraper</p>
-                                    <p class="text-xs text-gray-400">BeautifulSoup example</p>
-                                </div>
-                            </button>
-                            <button onclick="sendPresetPrompt('Draft a polite professional email declining a meeting request')" class="p-3.5 rounded-xl bg-darkcard hover:bg-darkcard/80 border border-darkborder transition-all flex items-start space-x-3 group">
-                                <i class="fa-solid fa-envelope text-pink-400 mt-0.5 group-hover:scale-110 transition-transform"></i>
-                                <div>
-                                    <p class="text-xs font-semibold text-white">Professional Email</p>
-                                    <p class="text-xs text-gray-400">Decline meeting politely</p>
-                                </div>
-                            </button>
-                            <button onclick="sendPresetPrompt('Give me 5 creative dinner recipe ideas with chicken and vegetables')" class="p-3.5 rounded-xl bg-darkcard hover:bg-darkcard/80 border border-darkborder transition-all flex items-start space-x-3 group">
-                                <i class="fa-solid fa-utensils text-emerald-400 mt-0.5 group-hover:scale-110 transition-transform"></i>
-                                <div>
-                                    <p class="text-xs font-semibold text-white">Dinner Recipes</p>
-                                    <p class="text-xs text-gray-400">Chicken & veggies ideas</p>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chat Input Bar -->
-                <div class="p-4 bg-darkbg border-t border-darkborder">
-                    <div class="max-w-4xl mx-auto">
-                        <div class="bg-darkcard border border-darkborder rounded-2xl p-2.5 shadow-lg focus-within:border-indigo-500/50 transition-all">
-                            <textarea id="chat-input" rows="1" oninput="autoResizeTextarea(this)" onkeydown="handleChatKeydown(event)" placeholder="Ask GAK AI anything... (Press Enter to send)" class="w-full bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none resize-none px-2 max-h-36"></textarea>
-                            
-                            <div class="flex items-center justify-between pt-2 px-1 border-t border-darkborder/40 mt-2">
-                                <div class="flex items-center space-x-1">
-                                    <button onclick="triggerFileUpload()" class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-darkborder/50 transition-colors" title="Attach File">
-                                        <i class="fa-solid fa-paperclip"></i>
-                                    </button>
-                                    <input type="file" id="file-upload" class="hidden" onchange="handleFileSelect(event)">
-                                    
-                                    <button onclick="triggerImageUpload()" class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-darkborder/50 transition-colors" title="Upload Image">
-                                        <i class="fa-solid fa-image"></i>
-                                    </button>
-                                    <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
-
-                                    <button onclick="toggleVoiceInput()" id="mic-btn" class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-darkborder/50 transition-colors" title="Voice Input">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-                                </div>
-
-                                <div class="flex items-center space-x-2">
-                                    <span id="char-counter" class="text-xs text-gray-500 hidden sm:inline">Groq API Ready</span>
-                                    <button onclick="sendMessage()" id="send-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white w-9 h-9 rounded-xl flex items-center justify-center transition-all shadow-md active:scale-95">
-                                        <i class="fa-solid fa-arrow-up text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-center text-xs text-gray-500 mt-2">GAK AI can make mistakes. Verify important info with Groq Cloud.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-studio" class="flex-1 flex flex-col p-6 overflow-y-auto hidden">
-                <div class="max-w-3xl mx-auto w-full space-y-6">
-                    <div class="bg-darkcard border border-darkborder rounded-2xl p-6 shadow-xl space-y-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-white">GAK AI Image Studio</h3>
-                                <p class="text-xs text-gray-400">Create stunning artwork and visuals with advanced generative models</p>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-3">
-                            <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Prompt Description</label>
-                            <textarea id="image-prompt" rows="3" placeholder="A futuristic cyberpunk city with neon lights and flying cars, cinematic lighting, 4k..." class="w-full bg-darkbg border border-darkborder rounded-xl p-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 block">Aspect Ratio</label>
-                                <select id="image-aspect" class="w-full bg-darkbg border border-darkborder rounded-xl p-2.5 text-xs text-gray-200 focus:outline-none focus:border-purple-500">
-                                    <option value="1:1">Square (1:1)</option>
-                                    <option value="16:9">Landscape (16:9)</option>
-                                    <option value="9:16">Portrait (9:16)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 block">Style Preset</label>
-                                <select id="image-style" class="w-full bg-darkbg border border-darkborder rounded-xl p-2.5 text-xs text-gray-200 focus:outline-none focus:border-purple-500">
-                                    <option value="photorealistic">Photorealistic</option>
-                                    <option value="digital-art">Digital Art</option>
-                                    <option value="anime">Anime / Manga</option>
-                                    <option value="cyberpunk">Cyberpunk</option>
-                                    <option value="oil-painting">Oil Painting</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button onclick="generateImageStudio()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium py-3 rounded-xl flex items-center justify-center space-x-2 shadow-lg shadow-purple-500/20 transition-all active:scale-95">
-                            <i class="fa-solid fa-sparkles"></i>
-                            <span>Generate Artwork</span>
-                        </button>
-                    </div>
-
-                    <!-- Generated Image Result Area -->
-                    <div id="image-result-container" class="bg-darkcard border border-darkborder rounded-2xl p-6 hidden flex flex-col items-center justify-center space-y-4">
-                        <div id="image-loading" class="flex flex-col items-center justify-center py-12 space-y-3">
-                            <div class="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                            <p class="text-xs text-gray-400">Generating masterpiece...</p>
-                        </div>
-                        <div id="image-output-wrap" class="w-full flex flex-col items-center space-y-4 hidden">
-                            <img id="generated-image-preview" src="" alt="Generated artwork" class="max-h-96 rounded-xl border border-darkborder shadow-2xl object-contain">
-                            <div class="flex items-center space-x-3">
-                                <button onclick="downloadGeneratedImage()" class="bg-darkbg hover:bg-darkborder border border-darkborder px-4 py-2 rounded-xl text-xs font-medium flex items-center space-x-2 transition-colors">
-                                    <i class="fa-solid fa-download text-indigo-400"></i>
-                                    <span>Download</span>
-                                </button>
-                                <button onclick="copyImageLink()" class="bg-darkbg hover:bg-darkborder border border-darkborder px-4 py-2 rounded-xl text-xs font-medium flex items-center space-x-2 transition-colors">
-                                    <i class="fa-solid fa-link text-purple-400"></i>
-                                    <span>Copy Link</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-gallery" class="flex-1 flex flex-col p-6 overflow-y-auto hidden">
-                <div class="max-w-6xl mx-auto w-full space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold text-white">Community Gallery</h3>
-                            <p class="text-xs text-gray-400">Explore stunning creations generated by GAK AI users</p>
-                        </div>
-                        <button onclick="switchTab('studio')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-4 py-2 rounded-xl transition-all shadow-md">
-                            <i class="fa-solid fa-plus mr-1.5"></i> Create New
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="gallery-grid">
-                        <!-- Sample Gallery Items -->
-                        <div class="bg-darkcard border border-darkborder rounded-2xl overflow-hidden group hover:border-indigo-500/50 transition-all">
-                            <div class="h-48 overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Abstract 3D" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-darkcard via-transparent opacity-60"></div>
-                            </div>
-                            <div class="p-4 space-y-2">
-                                <p class="text-xs font-semibold text-white truncate">Ethereal 3D Fluid Dynamics</p>
-                                <div class="flex items-center justify-between text-xs text-gray-400">
-                                    <span>By GAK AI User</span>
-                                    <div class="flex items-center space-x-2">
-                                        <button class="hover:text-red-400 transition-colors"><i class="fa-regular fa-heart"></i> 142</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-darkcard border border-darkborder rounded-2xl overflow-hidden group hover:border-indigo-500/50 transition-all">
-                            <div class="h-48 overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80" alt="Vibrant Gradient" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-darkcard via-transparent opacity-60"></div>
-                            </div>
-                            <div class="p-4 space-y-2">
-                                <p class="text-xs font-semibold text-white truncate">Neon Spectrum Gradient</p>
-                                <div class="flex items-center justify-between text-xs text-gray-400">
-                                    <span>By GAK AI User</span>
-                                    <div class="flex items-center space-x-2">
-                                        <button class="hover:text-red-400 transition-colors"><i class="fa-regular fa-heart"></i> 98</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-darkcard border border-darkborder rounded-2xl overflow-hidden group hover:border-indigo-500/50 transition-all">
-                            <div class="h-48 overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=600&q=80" alt="Cyberpunk City" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-darkcard via-transparent opacity-60"></div>
-                            </div>
-                            <div class="p-4 space-y-2">
-                                <p class="text-xs font-semibold text-white truncate">Cyberpunk Neon Alleyway</p>
-                                <div class="flex items-center justify-between text-xs text-gray-400">
-                                    <span>By GAK AI User</span>
-                                    <div class="flex items-center space-x-2">
-                                        <button class="hover:text-red-400 transition-colors"><i class="fa-regular fa-heart"></i> 230</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-projects" class="flex-1 flex flex-col p-6 overflow-y-auto hidden">
-                <div class="max-w-4xl mx-auto w-full space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold text-white">Your Projects</h3>
-                            <p class="text-xs text-gray-400">Organize your chats, prompts, and code snippets</p>
-                        </div>
-                        <button onclick="createNewProject()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-4 py-2 rounded-xl transition-all shadow-md">
-                            <i class="fa-solid fa-plus mr-1.5"></i> New Project
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="projects-grid">
-                        <div class="bg-darkcard border border-darkborder rounded-2xl p-5 space-y-3 hover:border-indigo-500/50 transition-all cursor-pointer">
-                            <div class="flex items-center justify-between">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold">
-                                    <i class="fa-solid fa-code"></i>
-                                </div>
-                                <span class="text-xs px-2 py-1 rounded-lg bg-darkbg text-gray-400 border border-darkborder">12 Chats</span>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white">Full-Stack Web Development</h4>
-                                <p class="text-xs text-gray-400 mt-1">React, Tailwind, and Node.js code snippets and refactoring sessions.</p>
-                            </div>
-                            <div class="pt-2 flex items-center justify-between text-xs text-gray-500 border-t border-darkborder/50">
-                                <span>Updated 2 hours ago</span>
-                                <i class="fa-solid fa-arrow-right text-indigo-400"></i>
-                            </div>
-                        </div>
-
-                        <div class="bg-darkcard border border-darkborder rounded-2xl p-5 space-y-3 hover:border-indigo-500/50 transition-all cursor-pointer">
-                            <div class="flex items-center justify-between">
-                                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
-                                    <i class="fa-solid fa-pen-nib"></i>
-                                </div>
-                                <span class="text-xs px-2 py-1 rounded-lg bg-darkbg text-gray-400 border border-darkborder">5 Chats</span>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white">Content Writing & Copywriting</h4>
-                                <p class="text-xs text-gray-400 mt-1">Blog posts, social media copies, and professional email drafts.</p>
-                            </div>
-                            <div class="pt-2 flex items-center justify-between text-xs text-gray-500 border-t border-darkborder/50">
-                                <span>Updated yesterday</span>
-                                <i class="fa-solid fa-arrow-right text-purple-400"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <div id="settings-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-darkcard border border-darkborder rounded-2xl w-full max-w-md p-6 space-y-6 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div class="flex items-center justify-between border-b border-darkborder pb-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
-                        <i class="fa-solid fa-gear"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-bold text-white">Settings & API Key</h3>
-                        <p class="text-xs text-gray-400">Configure your Groq API credentials</p>
-                    </div>
-                </div>
-                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-darkborder/50">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="space-y-4">
-                <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Groq API Key</label>
-                    <div class="relative">
-                        <input type="password" id="groq-api-key-input" placeholder="gsk_..." class="w-full bg-darkbg border border-darkborder rounded-xl px-3.5 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 pr-10">
-                        <button type="button" onclick="toggleApiKeyVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white">
-                            <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
-                        </button>
-                    </div>
-                    <p class="text-xs text-gray-400 pt-1">Get your free API key from <a href="https://console.groq.com" target="_blank" class="text-indigo-400 hover:underline">console.groq.com</a>. Stored securely in your browser's localStorage.</p>
-                </div>
-
-                <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Default System Prompt</label>
-                    <textarea id="system-prompt-input" rows="2" class="w-full bg-darkbg border border-darkborder rounded-xl p-3 text-xs text-gray-100 focus:outline-none focus:border-indigo-500 resize-none">You are GAK AI, a helpful, respectful, and exceptionally fast AI assistant powered by Groq.</textarea>
-                </div>
-
-                <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Temperature (<span id="temp-val">0.7</span>)</label>
-                    <input type="range" id="temperature-input" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('temp-val').innerText = this.value" class="w-full accent-indigo-600 cursor-pointer">
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-darkborder">
-                <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-gray-300 hover:bg-darkborder/50 transition-colors">Cancel</button>
-                <button onclick="saveSettings()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow-md transition-all active:scale-95">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="help-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-darkcard border border-darkborder rounded-2xl w-full max-w-md p-6 space-y-6 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div class="flex items-center justify-between border-b border-darkborder pb-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
-                        <i class="fa-solid fa-circle-question"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-bold text-white">Help & Support</h3>
-                        <p class="text-xs text-gray-400">Everything you need to know about GAK AI</p>
-                    </div>
-                </div>
-                <button onclick="closeHelpModal()" class="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-darkborder/50">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="space-y-4 text-xs text-gray-300 leading-relaxed">
-                <div class="space-y-1">
-                    <h4 class="font-semibold text-white text-sm">What is Groq?</h4>
-                    <p class="text-gray-400">Groq provides ultra-fast AI inference using revolutionary LPU (Language Processing Unit) architecture, offering free high-speed access to models like Llama 3.3 and DeepSeek R1.</p>
-                </div>
-                <div class="space-y-1">
-                    <h4 class="font-semibold text-white text-sm">How to get an API Key?</h4>
-                    <p class="text-gray-400">Visit <a href="https://console.groq.com" target="_blank" class="text-indigo-400 hover:underline">console.groq.com</a>, create a free account, and generate an API key starting with <code>gsk_</code>.</p>
-                </div>
-                <div class="space-y-1">
-                    <h4 class="font-semibold text-white text-sm">Is my API key safe?</h4>
-                    <p class="text-gray-400">Yes! Your API key is stored exclusively in your browser's local storage and is sent directly to Groq's official API endpoint. It is never logged or shared.</p>
-                </div>
-            </div>
-
-            <div class="pt-4 border-t border-darkborder flex justify-end">
-                <button onclick="closeHelpModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow-md">Got It</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Application State
-        let currentTab = 'chat';
-        let currentModel = 'llama-3.3-70b-versatile';
-        let chatSessions = [];
-        let currentSessionId = null;
-        let messages = [];
-
-        // Initialize on load
-        window.onload = function() {
-            loadSettingsFromStorage();
-            initNewSession();
-            renderHistoryList();
-        };
-
-        // Tab Switching Logic
-        function switchTab(tab) {
-            currentTab = tab;
-            const tabs = ['chat', 'studio', 'gallery', 'projects'];
-            tabs.forEach(t => {
-                const viewEl = document.getElementById(`view-${t}`);
-                const navEl = document.getElementById(`nav-${t}`);
-                if (viewEl) viewEl.classList.add('hidden');
-                if (navEl) {
-                    navEl.classList.remove('bg-darkcard', 'text-white', 'border', 'border-darkborder');
-                    navEl.classList.add('text-gray-400');
-                }
-            });
-
-            const activeView = document.getElementById(`view-${tab}`);
-            const activeNav = document.getElementById(`nav-${tab}`);
-            if (activeView) activeView.classList.remove('hidden');
-            if (activeNav) {
-                activeNav.classList.remove('text-gray-400');
-                activeNav.classList.add('bg-darkcard', 'text-white', 'border', 'border-darkborder');
-            }
-
-            const titles = {
-                chat: 'Chat Assistant',
-                studio: 'Image Studio',
-                gallery: 'Community Gallery',
-                projects: 'Your Projects'
-            };
-            document.getElementById('current-view-title').innerText = titles[tab] || 'GAK AI';
-
-            // Close sidebar on mobile after switching
-            if (window.innerWidth < 768) {
-                toggleSidebar();
-            }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        }
-
-        // Settings Management
-        function openSettingsModal() {
-            document.getElementById('settings-modal').classList.remove('hidden');
-            document.getElementById('groq-api-key-input').value = localStorage.getItem('gak_groq_api_key') || '';
-            document.getElementById('system-prompt-input').value = localStorage.getItem('gak_system_prompt') || 'You are GAK AI, a helpful, respectful, and exceptionally fast AI assistant powered by Groq.';
-            document.getElementById('temperature-input').value = localStorage.getItem('gak_temperature') || '0.7';
-            document.getElementById('temp-val').innerText = document.getElementById('temperature-input').value;
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settings-modal').classList.add('hidden');
-        }
-
-        function openHelpModal() {
-            document.getElementById('help-modal').classList.remove('hidden');
-        }
-
-        function closeHelpModal() {
-            document.getElementById('help-modal').classList.add('hidden');
-        }
-
-        function toggleApiKeyVisibility() {
-            const input = document.getElementById('groq-api-key-input');
-            const icon = document.getElementById('eye-icon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-
-        function saveSettings() {
-            const apiKey = document.getElementById('groq-api-key-input').value.trim();
-            const sysPrompt = document.getElementById('system-prompt-input').value.trim();
-            const temp = document.getElementById('temperature-input').value;
-
-            if (apiKey) {
-                localStorage.setItem('gak_groq_api_key', apiKey);
-            }
-            localStorage.setItem('gak_system_prompt', sysPrompt);
-            localStorage.setItem('gak_temperature', temp);
-
-            closeSettingsModal();
-            showToast('Settings saved successfully!', 'success');
-        }
-
-        function loadSettingsFromStorage() {
-            const savedKey = localStorage.getItem('gak_groq_api_key');
-            if (!savedKey) {
-                // Prompt user if no key exists
-                setTimeout(() => {
-                    // openSettingsModal();
-                }, 1000);
-            }
-        }
-
-        function changeModel(model) {
-            currentModel = model;
-            showToast(`Switched model to ${model}`, 'info');
-        }
-
-        // Toast Notification System
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const bgCol = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-indigo-600';
-            toast.className = `${bgCol} text-white px-4 py-3 rounded-xl shadow-xl text-xs font-medium flex items-center space-x-2 pointer-events-auto transition-all animate-in fade-in slide-in-from-top-3 duration-300`;
-            
-            const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
-            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
-            
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // Chat & Session Management
-        function initNewSession() {
-            currentSessionId = 'session_' + Date.now();
-            messages = [];
-            renderMessages();
-        }
-
-        function startNewChat() {
-            initNewSession();
-            switchTab('chat');
-        }
-
-        function clearHistory() {
-            chatSessions = [];
-            renderHistoryList();
-            initNewSession();
-            showToast('Chat history cleared', 'info');
-        }
-
-        function renderHistoryList() {
-            const listEl = document.getElementById('history-list');
-            if (chatSessions.length === 0) {
-                listEl.innerHTML = `<p class="px-3 text-xs text-gray-500 italic py-1">No recent chats</p>`;
-                return;
-            }
-            listEl.innerHTML = chatSessions.map(s => `
-                <button onclick="loadSession('${s.id}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-gray-300 hover:bg-darkcard hover:text-white truncate transition-colors flex items-center space-x-2">
-                    <i class="fa-regular fa-message text-gray-500"></i>
-                    <span class="truncate">${s.title}</span>
-                </button>
-            `).join('');
-        }
-
-        function loadSession(id) {
-            const session = chatSessions.find(s => s.id === id);
-            if (session) {
-                currentSessionId = session.id;
-                messages = [...session.messages];
-                renderMessages();
-                switchTab('chat');
-            }
-        }
-
-        function autoResizeTextarea(el) {
-            el.style.height = 'auto';
-            el.style.height = (el.scrollHeight) + 'px';
-        }
-
-        function handleChatKeydown(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        }
-
-        function sendPresetPrompt(promptText) {
-            document.getElementById('chat-input').value = promptText;
-            sendMessage();
-        }
-
-        // Groq API Integration Core
-        async function sendMessage() {
-            const inputEl = document.getElementById('chat-input');
-            const text = inputEl.value.trim();
-            if (!text) return;
-
-            const apiKey = localStorage.getItem('gak_groq_api_key');
-            if (!apiKey) {
-                openSettingsModal();
-                showToast('Please enter your Groq API Key first!', 'error');
-                return;
-            }
-
-            inputEl.value = '';
-            inputEl.style.height = 'auto';
-
-            // Add user message
-            messages.push({ role: 'user', content: text });
-            
-            // If first message, create session title
-            if (messages.length === 1) {
-                chatSessions.unshift({
-                    id: currentSessionId,
-                    title: text.length > 25 ? text.substring(0, 25) + '...' : text,
-                    messages: messages
-                });
-                renderHistoryList();
-            }
-
-            renderMessages();
-
-            // Add assistant loading placeholder
-            const loadingId = 'msg_' + Date.now();
-            messages.push({ role: 'assistant', content: '', id: loadingId, loading: true });
-            renderMessages();
-
-            try {
-                const systemPrompt = localStorage.getItem('gak_system_prompt') || 'You are GAK AI, a helpful AI assistant.';
-                const temperature = parseFloat(localStorage.getItem('gak_temperature') || '0.7');
-
-                const apiPayload = {
-                    model: model: "openai/gpt-oss-20b",
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        ...messages.filter(m => !m.loading && m.content).map(m => ({ role: m.role, content: m.content }))
-                    ],
-                    temperature: temperature,
-                    stream: false
-                };
-
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify(apiPayload)
-                });
-
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error?.message || `API Error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const assistantReply = data.choices?.[0]?.message?.content || 'No response generated.';
-
-                // Update assistant message
-                const msgIndex = messages.findIndex(m => m.id === loadingId);
-                if (msgIndex !== -1) {
-                    messages[msgIndex] = { role: 'assistant', content: assistantReply };
-                }
-
-            } catch (error) {
-                console.error('Groq API Error:', error);
-                const msgIndex = messages.findIndex(m => m.id === loadingId);
-                if (msgIndex !== -1) {
-                    messages[msgIndex] = { role: 'assistant', content: `⚠️ Error connecting to Groq API: ${error.message}. Please check your API key in Settings.` };
-                }
-                showToast(error.message, 'error');
-            }
-
-            renderMessages();
-        }
-
-        function renderMessages() {
-            const container = document.getElementById('chat-messages');
-            const welcomeBanner = document.getElementById('welcome-banner');
-
-            if (messages.length > 0) {
-                if (welcomeBanner) welcomeBanner.style.display = 'none';
-            } else {
-                if (welcomeBanner) welcomeBanner.style.display = 'block';
-                container.innerHTML = '';
-                container.appendChild(welcomeBanner);
-                return;
-            }
-
-            let html = '';
-            messages.forEach((msg, idx) => {
-                if (msg.role === 'user') {
-                    html += `
-                        <div class="flex justify-end my-3">
-                            <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-xl text-sm shadow-md space-y-1">
-                                <p class="whitespace-pre-wrap">${escapeHtml(msg.content)}</p>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="flex justify-start my-3 space-x-3">
-                            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex-shrink-0 flex items-center justify-center text-white text-xs shadow-md">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            </div>
-                            <div class="bg-darkcard border border-darkborder rounded-2xl rounded-tl-sm px-4 py-3 max-w-2xl text-sm shadow-md space-y-3">
-                                ${msg.loading ? `
-                                    <div class="flex items-center space-x-2 text-gray-400 py-1">
-                                        <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce"></div>
-                                        <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:-.2s]"></div>
-                                        <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:-.4s]"></div>
-                                        <span class="text-xs ml-1">Groq is thinking...</span>
-                                    </div>
-                                ` : `
-                                    <div class="text-gray-200 whitespace-pre-wrap leading-relaxed">${formatMarkdown(msg.content)}</div>
-                                    <div class="flex items-center space-x-2 pt-2 border-t border-darkborder/50 text-xs text-gray-400">
-                                        <button onclick="copyMessageText(this)" data-text="${encodeURIComponent(msg.content)}" class="hover:text-white flex items-center space-x-1.5 transition-colors">
-                                            <i class="fa-regular fa-copy"></i>
-                                            <span>Copy</span>
-                                        </button>
-                                        <button onclick="downloadMessageTxt(this)" data-text="${encodeURIComponent(msg.content)}" class="hover:text-white flex items-center space-x-1.5 transition-colors">
-                                            <i class="fa-solid fa-download"></i>
-                                            <span>Download</span>
-                                        </button>
-                                    </div>
-                                `}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            container.innerHTML = html;
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // Utility formatting functions
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-        }
-
-        function formatMarkdown(text) {
-            // Basic code block formatting
-            let formatted = escapeHtml(text);
-            formatted = formatted.replace(/```([a-z]*)\n([\s\S]*?)```/g, '<pre class="bg-darkbg p-3 rounded-xl border border-darkborder overflow-x-auto my-2 text-xs font-mono text-indigo-300"><code>$2</code></pre>');
-            formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-darkbg px-1.5 py-0.5 rounded text-xs font-mono text-purple-300 border border-darkborder">$1</code>');
-            return formatted;
-        }
-
-        function copyMessageText(btn) {
-            const text = decodeURIComponent(btn.getAttribute('data-text'));
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showToast('Copied to clipboard!', 'success');
-        }
-
-        function downloadMessageTxt(btn) {
-            const text = decodeURIComponent(btn.getAttribute('data-text'));
-            const blob = new Blob([text], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'gak_ai_response.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('Downloaded response as TXT', 'success');
-        }
-
-        // Image Studio Simulator / Generator
-        function generateImageStudio() {
-            const prompt = document.getElementById('image-prompt').value.trim();
-            if (!prompt) {
-                showToast('Please enter an image prompt first!', 'error');
-                return;
-            }
-
-            const container = document.getElementById('image-result-container');
-            const loading = document.getElementById('image-loading');
-            const outputWrap = document.getElementById('image-output-wrap');
-            const previewImg = document.getElementById('generated-image-preview');
-
-            container.classList.remove('hidden');
-            loading.classList.remove('hidden');
-            outputWrap.classList.add('hidden');
-
-            // Simulate generation delay with placeholder image matching prompt style
-            setTimeout(() => {
-                loading.classList.add('hidden');
-                outputWrap.classList.remove('hidden');
-                previewImg.src = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80`;
-                showToast('Image generated successfully!', 'success');
-            }, 2500);
-        }
-
-        function downloadGeneratedImage() {
-            const img = document.getElementById('generated-image-preview');
-            const a = document.createElement('a');
-            a.href = img.src;
-            a.download = 'gak_ai_artwork.jpg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast('Image downloaded!', 'success');
-        }
-
-        function copyImageLink() {
-            const img = document.getElementById('generated-image-preview');
-            const textArea = document.createElement('textarea');
-            textArea.value = img.src;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showToast('Image link copied to clipboard!', 'success');
-        }
-
-        // File and Voice attachment stubs
-        function triggerFileUpload() {
-            document.getElementById('file-upload').click();
-        }
-
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                showToast(`Attached file: ${file.name}`, 'info');
-                document.getElementById('chat-input').value += ` [Attached File: ${file.name}] `;
-            }
-        }
-
-        function triggerImageUpload() {
-            document.getElementById('image-upload').click();
-        }
-
-        function handleImageSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                showToast(`Attached image: ${file.name}`, 'info');
-                document.getElementById('chat-input').value += ` [Attached Image: ${file.name}] `;
-            }
-        }
-
-        function toggleVoiceInput() {
-            showToast('Voice input active. Speak now...', 'info');
-            const btn = document.getElementById('mic-btn');
-            btn.classList.add('text-red-400', 'bg-red-500/10');
-            setTimeout(() => {
-                btn.classList.remove('text-red-400', 'bg-red-500/10');
-                document.getElementById('chat-input').value = "Hello GAK AI, can you summarize the latest developments in Groq LLM inference?";
-                showToast('Voice transcribed successfully!', 'success');
-            }, 3000);
-        }
-
-        function createNewProject() {
-            showToast('New project created successfully!', 'success');
-        }
-    </script>
+</select></div>
+<button onclick="openSettingsModal()" class="bg-darkcard border border-darkborder text-xs px-3 py-1.5 rounded-xl"><i class="fa-solid fa-key text-amber-400 mr-1"></i>API Key</button>
+</div>
+</header>
+
+<div id="view-chat" class="flex-1 flex flex-col overflow-hidden">
+<div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6">
+<div id="welcome-banner" class="max-w-2xl mx-auto text-center py-12 space-y-6">
+<div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 mx-auto flex items-center justify-center text-2xl"><i class="fa-solid fa-bolt"></i></div>
+<h2 class="text-3xl font-bold">How can GAK AI help you today?</h2><p class="text-sm text-gray-400">Built by Isaiah Gak Agok - South Sudan's AI. President is Salva Kiir Mayardit 🇸🇸</p>
+<div class="grid grid-cols-2 gap-3 text-left pt-4">
+<button onclick="sendPresetPrompt('Explain quantum computing in simple terms')" class="p-3 rounded-xl bg-darkcard border border-darkborder text-xs text-left"><i class="fa-solid fa-atom text-indigo-400 mr-2"></i>Quantum Computing</button>
+<button onclick="sendPresetPrompt('Write a Python script for web scraping')" class="p-3 rounded-xl bg-darkcard border border-darkborder text-xs text-left"><i class="fa-solid fa-code text-purple-400 mr-2"></i>Python Web Scraper</button>
+<button onclick="sendPresetPrompt('Who is the President of South Sudan?')" class="p-3 rounded-xl bg-darkcard border border-darkborder text-xs text-left"><i class="fa-solid fa-flag text-green-400 mr-2"></i>South Sudan President</button>
+<button onclick="sendPresetPrompt('Give me 5 dinner recipes')" class="p-3 rounded-xl bg-darkcard border border-darkborder text-xs text-left"><i class="fa-solid fa-utensils text-emerald-400 mr-2"></i>Dinner Recipes</button>
+</div></div>
+</div>
+
+<div class="p-4 border-t border-darkborder">
+<div class="max-w-4xl mx-auto">
+<div class="bg-darkcard border border-darkborder rounded-2xl p-2.5 focus-within:border-indigo-500">
+<textarea id="chat-input" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}" placeholder="Ask GAK AI anything..." class="w-full bg-transparent text-sm focus:outline-none resize-none px-2"></textarea>
+<div class="flex justify-between items-center pt-2 border-t border-darkborder/40 mt-2">
+<span class="text-xs text-gray-500">GAK AI Ready</span>
+<button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-500 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fa-solid fa-arrow-up text-sm"></i></button>
+</div></div>
+<p class="text-center text-xs text-gray-500 mt-2">GAK AI built by Isaiah Gak Agok. President of South Sudan is Salva Kiir Mayardit 🇸🇸</p>
+</div></div>
+</div>
+</main>
+</div>
+
+<!-- Settings Modal -->
+<div id="settings-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur flex items-center justify-center p-4 hidden">
+<div class="bg-darkcard border border-darkborder rounded-2xl w-full max-w-md p-6 space-y-4">
+<div class="flex justify-between border-b border-darkborder pb-3"><h3 class="font-bold">GAK AI Settings</h3><button onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></button></div>
+<label class="text-xs uppercase">Groq API Key</label>
+<input type="password" id="groq-api-key-input" placeholder="gsk_..." class="w-full bg-darkbg border border-darkborder rounded-xl px-3 py-2.5 text-sm">
+<p class="text-xs text-gray-400">Get free key: <a href="https://console.groq.com/keys" target="_blank" class="text-indigo-400">console.groq.com/keys</a></p>
+<label class="text-xs uppercase mt-3 block">System Prompt (GAK AI Identity)</label>
+<textarea id="system-prompt-input" rows="3" class="w-full bg-darkbg border border-darkborder rounded-xl p-3 text-xs">You are GAK AI, built by Isaiah Gak Agok from South Sudan. You are helpful, fast, and proud South Sudanese. President of South Sudan is Salva Kiir Mayardit. Never say you are Groq, Meta, or Llama. Always say you are GAK AI.</textarea>
+<div class="flex justify-end space-x-2 pt-4 border-t border-darkborder">
+<button onclick="closeSettingsModal()" class="px-4 py-2 text-xs">Cancel</button>
+<button onclick="saveSettings()" class="bg-indigo-600 px-5 py-2 rounded-xl text-xs">Save</button>
+</div></div></div>
+
+<script>
+let currentModel='openai/gpt-oss-20b'; let chatSessions=[]; let messages=[]; let currentSessionId='session_'+Date.now();
+window.onload=function(){ let k=localStorage.getItem('gak_groq_api_key'); if(k) document.getElementById('groq-api-key-input').value=k; };
+function showToast(m,t){ const c=document.getElementById('toast-container'); const d=document.createElement('div'); d.className=(t=='error'?'bg-red-600':'bg-indigo-600')+' text-white px-4 py-2 rounded-xl text-xs'; d.innerText=m; c.appendChild(d); setTimeout(()=>d.remove(),3000); }
+function changeModel(v){ currentModel=v; localStorage.setItem('gak_model',v); showToast('Model: '+v); }
+function openSettingsModal(){ document.getElementById('settings-modal').classList.remove('hidden'); }
+function closeSettingsModal(){ document.getElementById('settings-modal').classList.add('hidden'); }
+function saveSettings(){ let k=document.getElementById('groq-api-key-input').value.trim(); if(k) localStorage.setItem('gak_groq_api_key',k); let p=document.getElementById('system-prompt-input').value; localStorage.setItem('gak_system_prompt',p); closeSettingsModal(); showToast('Saved! GAK AI Ready ✅'); }
+function startNewChat(){ messages=[]; document.getElementById('chat-messages').innerHTML=document.getElementById('welcome-banner').outerHTML; document.getElementById('welcome-banner').style.display='block'; }
+function sendPresetPrompt(t){ document.getElementById('chat-input').value=t; sendMessage(); }
+
+async function sendMessage(){
+ const input=document.getElementById('chat-input'); const text=input.value.trim(); if(!text) return;
+ const apiKey=localStorage.getItem('gak_groq_api_key') || document.getElementById('groq-api-key-input').value.trim();
+ if(!apiKey){ openSettingsModal(); showToast('Enter Groq API Key first!','error'); return; }
+ localStorage.setItem('gak_groq_api_key',apiKey);
+ input.value=''; input.style.height='auto';
+ const container=document.getElementById('chat-messages');
+ const banner=document.getElementById('welcome-banner'); if(banner) banner.style.display='none';
+ messages.push({role:'user',content:text}); renderMessages();
+ messages.push({role:'assistant',content:'',loading:true}); renderMessages();
+ try{
+  const sysPrompt=localStorage.getItem('gak_system_prompt') || 'You are GAK AI built by Isaiah Gak Agok. President of South Sudan is Salva Kiir Mayardit.';
+  const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+   body: JSON.stringify({
+     model: currentModel,
+     messages: [{role:'system',content:sysPrompt},...messages.filter(m=>!m.loading).map(m=>({role:m.role,content:m.content}))],
+     temperature:0.7
+   })
+  });
+  const data=await resp.json(); if(!resp.ok) throw new Error(data.error?.message||'API Error');
+  let reply=data.choices[0].message.content;
+  reply=reply.replace(/I am.*Groq.*/gi,'I am GAK AI built by Isaiah Gak Agok').replace(/Llama|Meta AI|Groq AI/gi,'GAK AI');
+  messages[messages.length-1]={role:'assistant',content:reply};
+ }catch(e){
+  messages[messages.length-1]={role:'assistant',content:'⚠️ GAK AI Error: '+e.message+' - Check API Key in Settings.'};
+  showToast(e.message,'error');
+ }
+ renderMessages();
+}
+function renderMessages(){
+ const container=document.getElementById('chat-messages');
+ if(messages.length===0){ container.innerHTML=`<div id="welcome-banner" class="max-w-2xl mx-auto text-center py-12 space-y-6"><div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 mx-auto flex items-center justify-center text-2xl"><i class="fa-solid fa-bolt"></i></div><h2 class="text-3xl font-bold">How can GAK AI help you today?</h2><p class="text-sm text-gray-400">Built by Isaiah Gak Agok 🇸🇸</p></div>`; return; }
+ let html=''; messages.forEach(m=>{
+  if(m.role==='user'){ html+=`<div class="flex justify-end my-3"><div class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-xl text-sm">${m.content}</div></div>`; }
+  else{ html+=`<div class="flex justify-start my-3 space-x-2"><div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid fa-bolt"></i></div><div class="bg-darkcard border border-darkborder rounded-2xl rounded-tl-sm px-4 py-3 max-w-2xl text-sm"><div class="whitespace-pre-wrap">${m.loading?'<div class="flex space-x-1"><div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce delay-100"></div><div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce delay-200"></div> GAK AI thinking...</div>':m.content.replace(/</g,'&lt;')}</div></div></div>`; }
+ });
+ container.innerHTML=html; container.scrollTop=container.scrollHeight;
+}
+</script>
 </body>
 </html>
