@@ -1,64 +1,572 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GAK AI - South Sudan's First AI by Isaiah Gak Agok</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={darkMode:'class',theme:{extend:{colors:{darkbg:'#0F1117',darksidebar:'#161922',darkcard:'#1E2330',darkborder:'#2A3042'}}}}</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>body{font-family:Inter,sans-serif}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>GAK AI - South Sudanese AI</title>
+
+  <meta
+    name="description"
+    content="GAK AI is an AI assistant created and built by Cotino Gak, whose real name is Isaiah Gak Agok."
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #080808;
+      --sidebar: #0d0d0d;
+      --panel: #111111;
+      --panel2: #171717;
+      --border: #292929;
+      --text: #ffffff;
+      --muted: #999999;
+      --accent: #ffffff;
+      --user: #242424;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    button,
+    textarea,
+    input {
+      font-family: inherit;
+    }
+
+    /* =========================
+       MAIN LAYOUT
+    ========================= */
+
+    .app {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 28px;
+    }
+
+    .logo span {
+      color: #49e38a;
+      font-size: 12px;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .new-chat {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid var(--border);
+      background: #171717;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .new-chat:hover {
+      background: #222;
+    }
+
+    .side-title {
+      color: #777;
+      font-size: 12px;
+      margin: 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .recent {
+      color: #aaa;
+      font-size: 13px;
+      padding: 9px;
+      border-radius: 7px;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .recent:hover {
+      background: #191919;
+      color: white;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+    }
+
+    .creator-box {
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+      color: #aaa;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .creator-box strong {
+      color: white;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 65px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      flex-shrink: 0;
+    }
+
+    .top-title {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #49e38a;
+    }
+
+    /* =========================
+       CHAT AREA
+    ========================= */
+
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 35px 20px 180px;
+    }
+
+    .welcome {
+      max-width: 850px;
+      margin: 70px auto 35px;
+      text-align: center;
+    }
+
+    .welcome-logo {
+      font-size: 45px;
+      font-weight: 900;
+      letter-spacing: -3px;
+      margin-bottom: 12px;
+    }
+
+    .welcome p {
+      color: #999;
+      font-size: 15px;
+    }
+
+    .cards {
+      max-width: 850px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: #101010;
+      padding: 18px;
+      border-radius: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      background: #181818;
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .card-text {
+      color: #777;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* =========================
+       MESSAGES
+    ========================= */
+
+    .messages {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .message {
+      margin: 18px 0;
+      display: flex;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      background: #222;
+    }
+
+    .message.user .avatar {
+      background: white;
+      color: black;
+    }
+
+    .message-content {
+      max-width: calc(100% - 45px);
+      line-height: 1.65;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .message.user .message-content {
+      background: var(--user);
+      padding: 11px 15px;
+      border-radius: 13px;
+    }
+
+    .message.ai .message-content {
+      padding-top: 5px;
+    }
+
+    .message-actions {
+      margin-top: 8px;
+    }
+
+    .copy-btn {
+      border: none;
+      background: transparent;
+      color: #777;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .copy-btn:hover {
+      color: white;
+    }
+
+    .generated-image {
+      max-width: 100%;
+      width: 600px;
+      border-radius: 14px;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+    }
+
+    /* =========================
+       COMPOSER
+    ========================= */
+
+    .composer-wrap {
+      position: fixed;
+      bottom: 0;
+      left: 260px;
+      right: 0;
+      background: linear-gradient(
+        transparent,
+        rgba(8,8,8,0.96) 35%
+      );
+      padding: 25px 20px 20px;
+    }
+
+    .composer {
+      max-width: 850px;
+      margin: auto;
+      border: 1px solid #333;
+      background: #111;
+      border-radius: 17px;
+      padding: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.4);
+    }
+
+    textarea {
+      width: 100%;
+      background: transparent;
+      color: white;
+      border: none;
+      outline: none;
+      resize: none;
+      min-height: 50px;
+      max-height: 180px;
+      font-size: 14px;
+      padding: 7px;
+      line-height: 1.5;
+    }
+
+    textarea::placeholder {
+      color: #666;
+    }
+
+    .composer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 7px;
+    }
+
+    .composer-tools {
+      display: flex;
+      gap: 7px;
+    }
+
+    .tool-btn {
+      background: transparent;
+      border: 1px solid #2b2b2b;
+      color: #aaa;
+      width: 35px;
+      height: 35px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .tool-btn:hover {
+      background: #222;
+      color: white;
+    }
+
+    .send-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: none;
+      background: white;
+      color: black;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .send-btn:hover {
+      background: #ddd;
+    }
+
+    .send-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* =========================
+       API SETTINGS
+    ========================= */
+
+    .settings {
+      position: fixed;
+      right: 20px;
+      top: 75px;
+      width: 350px;
+      background: #121212;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 18px;
+      display: none;
+      z-index: 100;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    }
+
+    .settings.show {
+      display: block;
+    }
+
+    .settings h3 {
+      margin-bottom: 8px;
+    }
+
+    .settings p {
+      color: #888;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .api-input {
+      width: 100%;
+      padding: 12px;
+      background: #080808;
+      color: white;
+      border: 1px solid #333;
+      border-radius: 8px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .save-key {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      background: white;
+      color: black;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 8px 0;
+    }
+
+    .typing span {
+      width: 6px;
+      height: 6px;
+      background: #888;
+      border-radius: 50%;
+      animation: bounce 1s infinite;
+    }
+
+    .typing span:nth-child(2) {
+      animation-delay: .15s;
+    }
+
+    .typing span:nth-child(3) {
+      animation-delay: .3s;
+    }
+
+    @keyframes bounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+
+      30% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 800px) {
+
+      .sidebar {
+        display: none;
+      }
+
+      .composer-wrap {
+        left: 0;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .welcome {
+        margin-top: 35px;
+      }
+
+      .welcome-logo {
+        font-size: 36px;
+      }
+
+      .settings {
+        left: 15px;
+        right: 15px;
+        width: auto;
+      }
+    }
+
+    @media (max-width: 450px) {
+
+      .chat-area {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        padding: 0 14px;
+      }
+    }
+  </style>
 </head>
-<body class="bg-darkbg text-gray-100 h-screen flex flex-col overflow-hidden">
-<div class="flex h-full w-full">
-<div id="toast-container" class="fixed top-5 right-5 z-50"></div>
 
-<!-- SIDEBAR - NO API KEY SETTINGS -->
-<aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 bg-darksidebar border-r border-darkborder flex flex-col -translate-x-full md:translate-x-0 transition-transform">
-<div class="p-4 border-b border-darkborder flex items-center space-x-3"><div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center"><i class="fa-solid fa-bolt"></i></div><div><h1 class="font-bold">GAK AI</h1><p class="text-sm text-indigo-400">By Isaiah Gak</p></div></div>
-<div class="p-3"><button onclick="startNewChat()" class="w-full bg-indigo-600 py-2.5 rounded-xl text-sm font-bold">+ New Chat</button></div>
-<div class="flex-1 overflow-y-auto px-3 py-2">
-<a href="#" onclick="switchTab('chat')" class="flex items-center space-x-3 px-3 py-3 rounded-xl bg-darkcard text-white border border-darkborder mt-2"><i class="fa-solid fa-comments w-5 text-indigo-400"></i>Chat Assistant</a>
-<a href="#" onclick="switchTab('studio')" class="flex items-center space-x-3 px-3 py-3 rounded-xl text-gray-300 hover:bg-darkcard mt-2 border border-purple-500/30"><i class="fa-solid fa-image w-5 text-purple-400"></i>Image Studio - REAL</a>
-</div>
-<div class="p-3 border-t border-darkborder"><div class="bg-darkcard p-3 rounded-xl flex items-center space-x-3"><div class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold">GK</div><div><p class="text-sm font-bold">GAK User</p><p class="text-xs text-emerald-400">GAK AI Active ● Live</p></div></div></div>
-</aside>
+<body>
 
-<!-- MAIN -->
-<main class="flex-1 flex flex-col overflow-hidden">
-<header class="h-16 border-b border-darkborder bg-darksidebar/60 flex items-center justify-between px-4">
-<div class="flex items-center space-x-3"><button onclick="toggleSidebar()" class="md:hidden"><i class="fa-solid fa-bars"></i></button><span class="font-bold text-lg">GAK AI</span><span class="text-xs px-2 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">By Isaiah Gak</span></div>
-<div class="flex items-center space-x-2"><select id="model-select" class="bg-darkcard border border-darkborder rounded-xl px-3 py-2 text-sm"><option value="openai/gpt-oss-20b" selected>GPT-OSS 20B ✅</option><option value="openai/gpt-oss-120b">GPT-OSS 120B</option></select><span class="text-xs px-3 py-2 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">● Live</span></div>
-</header>
+<div class="app">
 
-<div id="view-chat" class="flex-1 flex flex-col overflow-hidden"><div id="chat-messages" class="flex-1 overflow-y-auto p-5 space-y-5"><div id="welcome-banner" class="max-w-2xl mx-auto text-center py-10 space-y-6"><div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 mx-auto flex items-center justify-center text-3xl"><i class="fa-solid fa-bolt"></i></div><h2 class="text-3xl font-bold">How can GAK AI help you today?</h2><p class="text-base text-gray-300">Built by Isaiah Gak Agok 🇸🇸 President Salva Kiir Mayardit</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left pt-4"><button onclick="sendPresetPrompt('Generate image of South Sudanese boy standing with cows in cattle camp, sunset, ultra realistic')" class="p-4 rounded-xl bg-darkcard border border-indigo-500/50 text-base text-left"><span class="font-bold text-white">🐄 Boy with Cows - Cattle Camp</span><br><span class="text-gray-300 text-sm">Click to generate REAL photo</span></button><button onclick="sendPresetPrompt('Who is President of South Sudan?')" class="p-4 rounded-xl bg-darkcard border border-darkborder text-base text-left"><span class="font-bold">President of South Sudan</span><br><span class="text-gray-300 text-sm">Salva Kiir Mayardit</span></button></div></div></div>
-<div class="p-4 border-t border-darkborder bg-darkbg"><div class="max-w-4xl mx-auto"><div class="bg-darkcard border-2 border-darkborder rounded-2xl p-3 focus-within:border-indigo-500"><textarea id="chat-input" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}" placeholder="Type: boy with cows in cattle camp (for REAL photo) or ask anything..." class="w-full bg-transparent text-base focus:outline-none resize-none px-3 py-2"></textarea><div class="flex items-center justify-between pt-3 mt-2 border-t border-darkborder/50"><div class="flex items-center space-x-2"><button class="p-2.5 rounded-xl border border-darkborder"><i class="fa-solid fa-paperclip"></i></button><button class="p-2.5 rounded-xl border border-darkborder"><i class="fa-solid fa-image"></i></button><button class="p-2.5 rounded-xl border border-darkborder"><i class="fa-solid fa-microphone"></i></button></div><div class="flex items-center space-x-3"><span class="text-sm text-emerald-400">GAK AI Ready</span><button onclick="sendMessage()" class="bg-indigo-600 w-11 h-11 rounded-xl flex items-center justify-center"><i class="fa-solid fa-arrow-up"></i></button></div></div></div><p class="text-center text-sm text-gray-400 mt-3">GAK AI built by Isaiah Gak Agok 🇸🇸</p></div></div></div>
+  <!-- =========================
+       SIDEBAR
+  ========================== -->
 
-<div id="view-studio" class="flex-1 hidden flex-col p-6 overflow-y-auto"><div class="max-w-3xl mx-auto w-full space-y-6"><div class="bg-darkcard border border-darkborder rounded-2xl p-6 space-y-5"><h3 class="font-bold text-xl">GAK AI REAL Photo Generator</h3><textarea id="image-prompt" rows="4" placeholder="South Sudanese boy standing with cows in cattle camp, sunset..." class="w-full bg-darkbg border-2 border-darkborder rounded-xl p-4 text-base"></textarea><button onclick="generateImageStudio()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 py-4 rounded-xl text-base font-bold">Generate REAL Photo Now</button></div><div id="image-result-container" class="bg-darkcard border border-darkborder rounded-2xl p-6 hidden text-center"><div id="image-loading" class="py-10"><div class="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div><p id="loading-text">GAK AI creating your photo...</p></div><div id="image-output-wrap" class="hidden space-y-4"><img id="generated-image-preview" src="" class="max-h-[600px] mx-auto rounded-xl border border-darkborder w-full object-contain bg-black"><p id="image-prompt-display" class="text-base text-gray-300"></p><div class="flex justify-center space-x-3"><button onclick="downloadImg()" class="bg-darkbg border border-darkborder px-6 py-3 rounded-xl">Download HD</button><button onclick="copyImg()" class="bg-indigo-600 px-6 py-3 rounded-xl">Copy Link</button><button onclick="shareToChat()" class="bg-purple-600 px-6 py-3 rounded-xl">Send to Chat</button></div></div><div id="image-error" class="hidden py-6"><p class="text-red-400 mb-3">Server busy...</p><button onclick="retryGenerate()" class="bg-indigo-600 px-6 py-3 rounded-xl">Retry Now</button></div></div></div></div>
+  <aside class="sidebar">
 
-</main></div>
+    <div class="logo">
+      GAK AI
+      <span>● Live</span>
+    </div>
 
-<script>
-// ====== PUT YOUR GROQ API KEY HERE - INSIDE CODE, NOT IN DESIGN ======
-const GAK_API_KEY = "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";
-// Example: const GAK_API_KEY = "gsk_abc123xyz...";
-// =====================================================================
-const GAK_SYSTEM_PROMPT = "You are GAK AI built by Isaiah Gak Agok from South Sudan. President is Salva Kiir Mayardit.";
-let currentModel='openai/gpt-oss-20b'; let messages=[]; let lastPrompt='';
-function switchTab(t){ document.getElementById('view-chat').classList.add('hidden'); document.getElementById('view-studio').classList.add('hidden'); document.getElementById('view-chat').classList.remove('flex'); document.getElementById('view-studio').classList.remove('flex'); let v=document.getElementById('view-'+t); v.classList.remove('hidden'); v.classList.add('flex'); }
-function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
-function showToast(m){ const c=document.getElementById('toast-container'); const d=document.createElement('div'); d.className='bg-indigo-600 text-white px-5 py-3 rounded-xl text-base font-medium shadow-xl mb-2'; d.innerText=m; c.appendChild(d); setTimeout(()=>d.remove(),4000); }
-function startNewChat(){ messages=[]; renderMessages(); }
-function sendPresetPrompt(t){ document.getElementById('chat-input').value=t; if(t.toLowerCase().includes('generate image')){ document.getElementById('image-prompt').value=t.replace(/generate image of/gi,'').trim(); switchTab('studio'); generateImageStudio(); } else { sendMessage(); } }
-function cleanPrompt(raw){ let p=raw.replace(/can you generate|generate image of|generate image|generate/gi,'').trim(); return p.length<3?raw:p; }
-function generateImageStudio(){ let raw=document.getElementById('image-prompt').value.trim(); if(!raw){ showToast('Type description!'); return; } let prompt=cleanPrompt(raw); lastPrompt=prompt; document.getElementById('image-prompt-display').innerText='Prompt: "'+prompt+'"'; let c=document.getElementById('image-result-container'); let l=document.getElementById('image-loading'); let o=document.getElementById('image-output-wrap'); let e=document.getElementById('image-error'); let img=document.getElementById('generated-image-preview'); c.classList.remove('hidden'); l.classList.remove('hidden'); o.classList.add('hidden'); e.classList.add('hidden'); let seed=Math.floor(Math.random()*9999999); let url1=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + ', ultra realistic photo, South Sudanese, cinematic lighting, 8k')}?seed=${seed}&width=1280&height=960&nologo=true&model=flux`; let url2=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed+1}&width=1280&height=960&nologo=true&model=turbo`; let tried=false; setTimeout(()=>{ if(!tried){ tried=true; img.src=url2; } },8000); img.onload=()=>{ l.classList.add('hidden'); o.classList.remove('hidden'); }; img.onerror=()=>{ if(!tried){ tried=true; img.src=url2; } else { l.classList.add('hidden'); e.classList.remove('hidden'); } }; img.src=url1; }
-function retryGenerate(){ generateImageStudio(); }
-function downloadImg(){ window.open(document.getElementById('generated-image-preview').src,'_blank'); }
-function copyImg(){ navigator.clipboard.writeText(document.getElementById('generated-image-preview').src); showToast('Link copied!'); }
-function shareToChat(){ let i=document.getElementById('generated-image-preview'); let p=lastPrompt; switchTab('chat'); messages.push({role:'user',content:p}); messages.push({role:'assistant',content:`Generated: "${p}"`, isImage:true, imgUrl:i.src}); renderMessages(); }
-async function sendMessage(){ let input=document.getElementById('chat-input'); let text=input.value.trim(); if(!text) return; if(!GAK_API_KEY || GAK_API_KEY.includes("PASTE_YOUR")){ showToast('⚠️ Add your Groq key inside code first!'); return; } input.value=''; let banner=document.getElementById('welcome-banner'); if(banner) banner.style.display='none'; let lower=text.toLowerCase(); if(lower.includes('cow')||lower.includes('cattle')||lower.includes('boy')||lower.includes('photo')||lower.includes('imag')){ if(text.length<150){ let prompt=cleanPrompt(text); messages.push({role:'user',content:text}); renderMessages(); let seed=Math.floor(Math.random()*9999999); let imgUrl=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + ', ultra realistic, 8k')}?seed=${seed}&width=1280&height=960&nologo=true&model=flux`; messages.push({role:'assistant',content:`🎨 GAK AI Photo for: "${prompt}"`, isImage:true, imgUrl:imgUrl}); renderMessages(); return; } } messages.push({role:'user',content:text}); renderMessages(); messages.push({role:'assistant',content:'',loading:true}); renderMessages(); try{ let resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GAK_API_KEY},body:JSON.stringify({model:currentModel,messages:[{role:'system',content:GAK_SYSTEM_PROMPT},...messages.filter(m=>!m.loading&&!m.isImage).map(m=>({role:m.role,content:m.content}))],temperature:0.7})}); let data=await resp.json(); if(!resp.ok) throw new Error(data.error?.message); let reply=data.choices[0].message.content.replace(/Groq|Meta AI|Llama/gi,'GAK AI'); messages[messages.length-1]={role:'assistant',content:reply}; }catch(e){ messages[messages.length-1]={role:'assistant',content:'⚠️ Error: '+e.message}; } renderMessages(); }
-function renderMessages(){ let container=document.getElementById('chat-messages'); if(messages.length===0){ container.innerHTML=document.getElementById('welcome-banner').outerHTML; return; } let html=''; messages.forEach(m=>{ if(m.role==='user'){ html+=`<div class="flex justify-end my-5"><div class="bg-indigo-600 text-white rounded-2xl px-6 py-4 max-w-xl">${m.content}</div></div>`; } else { if(m.loading){ html+=`<div class="flex justify-start my-5"><div class="bg-darkcard border border-darkborder rounded-2xl px-6 py-4 text-gray-300">GAK AI thinking...</div></div>`; } else if(m.isImage){ html+=`<div class="flex justify-start my-6 space-x-3"><div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-bolt"></i></div><div class="bg-darkcard border border-darkborder rounded-2xl p-4 max-w-2xl w-full"><p class="mb-3 font-bold">${m.content}</p><img src="${m.imgUrl}" class="rounded-xl w-full max-h-[550px] object-contain bg-black"><div class="flex space-x-3 mt-4"><a href="${m.imgUrl}" target="_blank" class="bg-indigo-600 px-5 py-2.5 rounded-xl font-bold">Open Full HD</a><button onclick="navigator.clipboard.writeText('${m.imgUrl}')" class="bg-darkbg border border-darkborder px-5 py-2.5 rounded-xl">Copy Link</button></div></div></div>`; } else { html+=`<div class="flex justify-start my-5 space-x-3"><div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-bolt"></i></div><div class="bg-darkcard border border-darkborder rounded-2xl px-6 py-4 max-w-2xl whitespace-pre-wrap">${m.content.replace(/</g,'&lt;')}</div></div>`; } } }); container.innerHTML=html; container.scrollTop=container.scrollHeight; }
-document.getElementById('model-select').addEventListener('change',(e)=>{ currentModel=e.target.value; showToast('Model: '+currentModel); });
-</script>
-</body>
-</html>
+    <button class="new-chat" onclick="newChat()">
+      ＋ New Chat
+    </button>
+
+    <div class="side-title">
+      Recent
+    </div>
+
+    <div id="recentChats"></div>
+
+    <div class="sidebar
