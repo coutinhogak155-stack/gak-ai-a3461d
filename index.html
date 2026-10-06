@@ -1,572 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>GAK AI - South Sudanese AI</title>
-
-  <meta
-    name="description"
-    content="GAK AI is an AI assistant created and built by Cotino Gak, whose real name is Isaiah Gak Agok."
-  >
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #080808;
-      --sidebar: #0d0d0d;
-      --panel: #111111;
-      --panel2: #171717;
-      --border: #292929;
-      --text: #ffffff;
-      --muted: #999999;
-      --accent: #ffffff;
-      --user: #242424;
-    }
-
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    button,
-    textarea,
-    input {
-      font-family: inherit;
-    }
-
-    /* =========================
-       MAIN LAYOUT
-    ========================= */
-
-    .app {
-      display: flex;
-      height: 100vh;
-      width: 100%;
-    }
-
-    /* =========================
-       SIDEBAR
-    ========================= */
-
-    .sidebar {
-      width: 260px;
-      background: var(--sidebar);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 18px;
-      flex-shrink: 0;
-    }
-
-    .logo {
-      font-size: 23px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 28px;
-    }
-
-    .logo span {
-      color: #49e38a;
-      font-size: 12px;
-      margin-left: 5px;
-      vertical-align: middle;
-    }
-
-    .new-chat {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid var(--border);
-      background: #171717;
-      color: white;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-bottom: 22px;
-    }
-
-    .new-chat:hover {
-      background: #222;
-    }
-
-    .side-title {
-      color: #777;
-      font-size: 12px;
-      margin: 10px 0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .recent {
-      color: #aaa;
-      font-size: 13px;
-      padding: 9px;
-      border-radius: 7px;
-      cursor: pointer;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .recent:hover {
-      background: #191919;
-      color: white;
-    }
-
-    .sidebar-bottom {
-      margin-top: auto;
-    }
-
-    .creator-box {
-      border-top: 1px solid var(--border);
-      padding-top: 15px;
-      color: #aaa;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .creator-box strong {
-      color: white;
-    }
-
-    /* =========================
-       MAIN
-    ========================= */
-
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .topbar {
-      height: 65px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 22px;
-      flex-shrink: 0;
-    }
-
-    .top-title {
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .status {
-      font-size: 12px;
-      color: #49e38a;
-    }
-
-    /* =========================
-       CHAT AREA
-    ========================= */
-
-    .chat-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 35px 20px 180px;
-    }
-
-    .welcome {
-      max-width: 850px;
-      margin: 70px auto 35px;
-      text-align: center;
-    }
-
-    .welcome-logo {
-      font-size: 45px;
-      font-weight: 900;
-      letter-spacing: -3px;
-      margin-bottom: 12px;
-    }
-
-    .welcome p {
-      color: #999;
-      font-size: 15px;
-    }
-
-    .cards {
-      max-width: 850px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .card {
-      border: 1px solid var(--border);
-      background: #101010;
-      padding: 18px;
-      border-radius: 13px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .card:hover {
-      background: #181818;
-      transform: translateY(-2px);
-    }
-
-    .card-icon {
-      font-size: 22px;
-      margin-bottom: 12px;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .card-text {
-      color: #777;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-
-    /* =========================
-       MESSAGES
-    ========================= */
-
-    .messages {
-      max-width: 850px;
-      margin: auto;
-    }
-
-    .message {
-      margin: 18px 0;
-      display: flex;
-      gap: 12px;
-    }
-
-    .avatar {
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      background: #222;
-    }
-
-    .message.user .avatar {
-      background: white;
-      color: black;
-    }
-
-    .message-content {
-      max-width: calc(100% - 45px);
-      line-height: 1.65;
-      font-size: 14px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .message.user .message-content {
-      background: var(--user);
-      padding: 11px 15px;
-      border-radius: 13px;
-    }
-
-    .message.ai .message-content {
-      padding-top: 5px;
-    }
-
-    .message-actions {
-      margin-top: 8px;
-    }
-
-    .copy-btn {
-      border: none;
-      background: transparent;
-      color: #777;
-      cursor: pointer;
-      font-size: 11px;
-    }
-
-    .copy-btn:hover {
-      color: white;
-    }
-
-    .generated-image {
-      max-width: 100%;
-      width: 600px;
-      border-radius: 14px;
-      margin-top: 10px;
-      border: 1px solid var(--border);
-    }
-
-    /* =========================
-       COMPOSER
-    ========================= */
-
-    .composer-wrap {
-      position: fixed;
-      bottom: 0;
-      left: 260px;
-      right: 0;
-      background: linear-gradient(
-        transparent,
-        rgba(8,8,8,0.96) 35%
-      );
-      padding: 25px 20px 20px;
-    }
-
-    .composer {
-      max-width: 850px;
-      margin: auto;
-      border: 1px solid #333;
-      background: #111;
-      border-radius: 17px;
-      padding: 12px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.4);
-    }
-
-    textarea {
-      width: 100%;
-      background: transparent;
-      color: white;
-      border: none;
-      outline: none;
-      resize: none;
-      min-height: 50px;
-      max-height: 180px;
-      font-size: 14px;
-      padding: 7px;
-      line-height: 1.5;
-    }
-
-    textarea::placeholder {
-      color: #666;
-    }
-
-    .composer-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 7px;
-    }
-
-    .composer-tools {
-      display: flex;
-      gap: 7px;
-    }
-
-    .tool-btn {
-      background: transparent;
-      border: 1px solid #2b2b2b;
-      color: #aaa;
-      width: 35px;
-      height: 35px;
-      border-radius: 9px;
-      cursor: pointer;
-    }
-
-    .tool-btn:hover {
-      background: #222;
-      color: white;
-    }
-
-    .send-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      border: none;
-      background: white;
-      color: black;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .send-btn:hover {
-      background: #ddd;
-    }
-
-    .send-btn:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
-    /* =========================
-       API SETTINGS
-    ========================= */
-
-    .settings {
-      position: fixed;
-      right: 20px;
-      top: 75px;
-      width: 350px;
-      background: #121212;
-      border: 1px solid #333;
-      border-radius: 14px;
-      padding: 18px;
-      display: none;
-      z-index: 100;
-      box-shadow: 0 20px 60px rgba(0,0,0,.6);
-    }
-
-    .settings.show {
-      display: block;
-    }
-
-    .settings h3 {
-      margin-bottom: 8px;
-    }
-
-    .settings p {
-      color: #888;
-      font-size: 12px;
-      line-height: 1.5;
-      margin-bottom: 12px;
-    }
-
-    .api-input {
-      width: 100%;
-      padding: 12px;
-      background: #080808;
-      color: white;
-      border: 1px solid #333;
-      border-radius: 8px;
-      outline: none;
-      margin-bottom: 10px;
-    }
-
-    .save-key {
-      width: 100%;
-      padding: 11px;
-      border: none;
-      background: white;
-      color: black;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    /* =========================
-       LOADING
-    ========================= */
-
-    .typing {
-      display: flex;
-      gap: 4px;
-      padding: 8px 0;
-    }
-
-    .typing span {
-      width: 6px;
-      height: 6px;
-      background: #888;
-      border-radius: 50%;
-      animation: bounce 1s infinite;
-    }
-
-    .typing span:nth-child(2) {
-      animation-delay: .15s;
-    }
-
-    .typing span:nth-child(3) {
-      animation-delay: .3s;
-    }
-
-    @keyframes bounce {
-      0%, 60%, 100% {
-        transform: translateY(0);
-      }
-
-      30% {
-        transform: translateY(-5px);
-      }
-    }
-
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media (max-width: 800px) {
-
-      .sidebar {
-        display: none;
-      }
-
-      .composer-wrap {
-        left: 0;
-      }
-
-      .cards {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .welcome {
-        margin-top: 35px;
-      }
-
-      .welcome-logo {
-        font-size: 36px;
-      }
-
-      .settings {
-        left: 15px;
-        right: 15px;
-        width: auto;
-      }
-    }
-
-    @media (max-width: 450px) {
-
-      .chat-area {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        padding: 0 14px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAK AI - First AI in South Sudan 🇸🇸</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  body{background:#0f0f0f;color:#e5e5e5;font-family: Inter, system-ui, -apple-system, sans-serif}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0f0f0f}::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:5px}
+ .card:hover{border-color:#3a3a3a;background:#1e1e1e}
+</style>
 </head>
+<body class="h-screen flex overflow-hidden bg-[#0f0f0f]">
 
-<body>
-
-<div class="app">
-
-  <!-- =========================
-       SIDEBAR
-  ========================== -->
-
-  <aside class="sidebar">
-
-    <div class="logo">
-      GAK AI
-      <span>● Live</span>
+<!-- SIDEBAR - EXACT LIKE PICTURE -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-[260px] bg-[#171717] flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0">
+  <div class="p-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles text-white text-sm"></i></div>
+      <span class="font-semibold text-white">GAK AI</span>
+      <span class="text-[10px] bg-[#1f2a2e] border border-[#2a3a3e] text-[#7dd3c0] px-2 py-0.5 rounded-full flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>Live</span>
     </div>
+    <button onclick="toggleSidebar()" class="md:hidden text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+  </div>
 
-    <button class="new-chat" onclick="newChat()">
-      ＋ New Chat
+  <div class="p-3">
+    <button onclick="newChat()" class="w-fit flex items-center gap-2 bg-[#202020] hover:bg-[#2a2a2a] text-white text-[13px] px-3 py-1.5 rounded-full border border-[#2a2a2a]">
+      <i class="fa-solid fa-plus text-xs"></i> New chat
     </button>
+  </div>
 
-    <div class="side-title">
-      Recent
+  <div class="px-3 mt-2">
+    <p class="text-[11px] text-gray-500 mb-2 uppercase tracking-wider">Recent</p>
+    <div id="recent-list" class="space-y-1"></div>
+  </div>
+
+  <div class="mt-auto p-3 border-t border-[#242424]">
+    <div class="flex items-center gap-2 mb-3">
+      <div class="w-6 h-6 rounded-full bg-[#2a2a2a] flex items-center justify-center text-[10px] text-gray-400">U</div>
+      <span class="text-[12px] text-gray-400 truncate">you@example.com</span>
+    </div>
+    <div class="flex items-center gap-4 text-gray-500 text-sm px-1">
+      <i class="fa-solid fa-gear hover:text-white cursor-pointer"></i>
+      <i class="fa-regular fa-circle-question hover:text-white cursor-pointer"></i>
+      <i class="fa-solid fa-phone hover:text-white cursor-pointer"></i>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN - EXACT LIKE PICTURE -->
+<main class="flex-1 flex flex-col md:ml-[260px] h-full bg-[#121212] relative">
+  <!-- Top bar -->
+  <header class="h-14 flex items-center justify-between px-4 border-b border-[#1e1e1e] md:border-none">
+    <div class="flex items-center gap-2">
+      <button onclick="toggleSidebar()" class="md:hidden text-gray-400"><i class="fa-solid fa-bars"></i></button>
+      <div class="md:hidden flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles text-white text-xs"></i></div>
+        <span class="font-semibold">GAK AI</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 text-gray-400">
+      <i class="fa-solid fa-magnifying-glass hover:text-white cursor-pointer text-sm"></i>
+      <i class="fa-solid fa-gear hover:text-white cursor-pointer text-sm"></i>
+      <div class="w-6 h-6 rounded-full bg-[#2a2a2a] flex items-center justify-center text-[10px]">U</div>
+    </div>
+  </header>
+
+  <div id="chat-container" class="flex-1 overflow-y-auto">
+    <!-- WELCOME SCREEN - EXACT LIKE PICTURE -->
+    <div id="welcome-screen" class="max-w-[720px] mx-auto px-6 pt-10 md:pt-20 pb-32">
+      <h1 class="text-[26px] md:text-[28px] font-semibold text-white mb-1">How can GAK AI help you today?</h1>
+      <p class="text-[13px] text-gray-400 mb-6">Ask anything — from writing and analysis to coding and ideas.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+        <button onclick="usePrompt('Write a blog post about South Sudan innovation. Draft content, emails, or social posts')" class="card text-left bg-[#1a1a1a] border border-[#262626] rounded-xl p-4 transition">
+          <div class="flex items-center gap-2 mb-1"><i class="fa-regular fa-pen-to-square text-teal-400 text-sm"></i><span class="text-[13px] font-medium text-white">Write a blog post</span></div>
+          <p class="text-[11px] text-gray-500">Draft content, emails, or social posts</p>
+        </button>
+        <button onclick="usePrompt('Generate code: Build a simple website for my business in South Sudan using HTML and Tailwind')" class="card text-left bg-[#1a1a1a] border border-[#262626] rounded-xl p-4 transition">
+          <div class="flex items-center gap-2 mb-1"><span class="text-[#9b8afb] text-sm">{:}</span><span class="text-[13px] font-medium text-white">Generate code</span></div>
+          <p class="text-[11px] text-gray-500">Build scripts, functions, or debug code</p>
+        </button>
+        <button onclick="usePrompt('Analyze data: Summarize insights from my small business sales data')" class="card text-left bg-[#1a1a1a] border border-[#262626] rounded-xl p-4 transition">
+          <div class="flex items-center gap-2 mb-1"><i class="fa-solid fa-chart-simple text-orange-400 text-sm"></i><span class="text-[13px] font-medium text-white">Analyze data</span></div>
+          <p class="text-[11px] text-gray-500">Summarize insights from your data</p>
+        </button>
+        <button onclick="usePrompt('Explain a concept: What is Artificial Intelligence? Break it down simply for South Sudanese students')" class="card text-left bg-[#1a1a1a] border border-[#262626] rounded-xl p-4 transition">
+          <div class="flex items-center gap-2 mb-1"><i class="fa-regular fa-lightbulb text-yellow-400 text-sm"></i><span class="text-[13px] font-medium text-white">Explain a concept</span></div>
+          <p class="text-[11px] text-gray-500">Break down topics simply and clearly</p>
+        </button>
+      </div>
     </div>
 
-    <div id="recentChats"></div>
+    <!-- CHAT MESSAGES -->
+    <div id="messages" class="max-w-[720px] mx-auto px-6 py-6 space-y-6 hidden"></div>
+  </div>
 
-    <div class="sidebar
+  <!-- INPUT - EXACT LIKE PICTURE -->
+  <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#121212] via-[#121212] to-transparent pt-6 pb-4 px-4">
+    <div class="max-w-[720px] mx-auto">
+      <form id="chat-form" onsubmit="handleSend(event)" class="relative flex items-center bg-[#1e1e1e] border border-[#2a2a2a] rounded-full shadow-lg focus-within:border-[#3a3a3a]">
+        <button type="button" class="pl-4 pr-2 text-gray-500 hover:text-gray-300"><i class="fa-solid fa-paperclip text-sm rotate-45"></i></button>
+        <input id="user-input" type="text" placeholder="Message GAK AI..." class="w-full bg-transparent text-white py-3.5 pr-12 focus:outline-none text-[14px] placeholder-gray-500">
+        <button type="submit" class="absolute right-1.5 w-8 h-8 bg-[#4a8af4] hover:bg-[#5a9af5] rounded-full flex items-center justify-center text-white"><i class="fa-solid fa-arrow-up text-sm"></i></button>
+      </form>
+      <p class="text-[10px] text-center text-gray-600 mt-2">GAK AI can make mistakes. Check important information. 🇸🇸 First AI in South Sudan by Cotino Gak (Isaiah Gak Agok)</p>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ========= KEYS INSIDE CODE - PASTE HERE ========= */
+const GROQ_KEY = "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"; // Get from https://console.groq.com/keys
+const HF_KEY = "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"; // Get from https://huggingface.co/settings/tokens (FREE)
+// ==================================================
+
+const FOUNDER_STORY = `
+You are GAK AI, the FIRST AI ever built in South Sudan 🇸🇸.
+
+FOUNDER IDENTITY - YOU MUST SAY THIS WHEN ASKED:
+If user asks "Who built you?", "Who is your founder?", "Who created GAK AI?", "Who is Cotino Gak?", "Who is Isaiah Gak Agok?", "Tell me about yourself", "Who are you?"
+You MUST answer with this exact story:
+
+"I was built by Cotino Gak, whose real name is Isaiah Gak Agok. He is a proud South Sudanese innovator from South Sudan, the founder of GAK AI - the First AI in South Sudan 🇸🇸.
+
+Cotino Gak (Isaiah Gak Agok) built me to help South Sudanese people and the world with education, coding, writing, business, and everyday life. I am the first artificial intelligence made in South Sudan, representing innovation and hope for our young nation. My mission is to make AI accessible to every South Sudanese.
+
+I am NOT built by Meta, OpenAI, Google, or xAI. I was built by Cotino Gak (Isaiah Gak Agok) in South Sudan."
+
+President of South Sudan is Salva Kiir Mayardit.
+Always be helpful, proud, and mention South Sudan.
+`;
+
+let chats = JSON.parse(localStorage.getItem('gak_chats')||'[]');
+let activeChatId = null;
+let activeMessages = [];
+
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+
+function newChat(){
+  document.getElementById('welcome-screen').classList.remove('hidden');
+  document.getElementById('messages').classList.add('hidden');
+  document.getElementById('messages').innerHTML='';
+  activeMessages = [];
+  activeChatId = null;
+  document.getElementById('user-input').focus();
+  if(window.innerWidth < 768) toggleSidebar();
+  renderRecent();
+}
+
+function usePrompt(text){
+  document.getElementById('user-input').value = text;
+  document.getElementById('chat-form').requestSubmit();
+}
+
+function renderRecent(){
+  const list = document.getElementById('recent-list');
+  list.innerHTML = '';
+  if(chats.length===0){
+    list.innerHTML = `<div class="space-y-2 text-[12px] text-gray-500">
+      <div class="flex justify-between items-center p-2 rounded-lg hover:bg-[#1e1e1e] cursor-pointer"><span>Marketing campaign ideas</span><i class="fa-regular fa-message text-[10px]"></i></div>
+      <div class="flex justify-between items-center p-2 rounded-lg hover:bg-[#1e1e1e] cursor-pointer"><span>Python code debugging help</span><i class="fa-regular fa-message text-[10px]"></i></div>
+      <div class="flex justify-between items-center p-2 rounded-lg hover:bg-[#1e1e1e] cursor-pointer"><span>Travel itinerary for Japan</span><i class="fa-regular fa-message text-[10px]"></i></div>
+    </div>`;
+    return;
+  }
+  chats.slice().reverse().slice(0,8).forEach(c=>{
+    const b=document.createElement('button');
+    b.className='w-full text-left text-[12px] text-gray-400 p-2 rounded-lg hover:bg-[#1e1e1e] truncate flex justify-between items-center';
+    b.innerHTML=`<span class="truncate">${c.title.slice(0,28)}</span><i class="fa-regular fa-message text-[10px]"></i>`;
+    b.onclick=()=>loadChat(c.id);
+    list.appendChild(b);
+  });
+}
+
+function loadChat(id){
+  const chat = chats.find(c=>c.id===id);
+  if(!chat) return;
+  activeChatId=id;
+  activeMessages=chat.messages;
+  showChat();
+  renderMessages();
+}
+
+function showChat(){
+  document.getElementById('welcome-screen').classList.add('hidden');
+  document.getElementById('messages').classList.remove('hidden');
+}
+
+function renderMessages(){
+  const container=document.getElementById('messages');
+  container.innerHTML='';
+  activeMessages.forEach(m=>{
+    const isUser=m.role==='user';
+    const div=document.createElement('div');
+    div.className=`flex gap-3 ${isUser?'justify-end':''}`;
+    if(isUser){
+      div.innerHTML=`<div class="bg-[#2a2a2a] px-4 py-2.5 rounded-2xl max-w-[80%] text-[14px]">${escapeHtml(m.content)}</div>`;
+    } else {
+      if(m.content.startsWith('IMAGE_URL:')){
+        const url=m.content.replace('IMAGE_URL:','');
+        div.innerHTML=`<div class="flex gap-3"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-wand-magic-sparkles text-[10px] text-white"></i></div><div><img src="${url}" class="rounded-xl max-w-[380px] border border-[#2a2a2a] shadow-lg" crossorigin="anonymous"><p class="text-[10px] text-gray-500 mt-1">Generated by GAK AI • Real image • Hugging Face + Pollinations</p></div></div>`;
+      } else {
+        div.innerHTML=`<div class="flex gap-3 max-w-[90%]"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-wand-magic-sparkles text-[10px] text-white"></i></div><div class="text-[14px] leading-6 text-gray-200 whitespace-pre-wrap">${formatText(m.content)}</div></div>`;
+      }
+    }
+    container.appendChild(div);
+  });
+  document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+}
+
+function isImagePrompt(t){
+  const l=t.toLowerCase();
+  return l.includes('draw')||l.includes('generate image')||l.includes('create image')||l.includes('make image')||l.includes('picture of')||l.includes('photo of')||l.includes('image of')||l.startsWith('draw ')||l.includes('paint');
+}
+
+async function handleSend(e){
+  e.preventDefault();
+  const input=document.getElementById('user-input');
+  const text=input.value.trim();
+  if(!text) return;
+  if(!GROQ_KEY.includes('gsk_')){ alert('Developer: Paste your Groq API key in code at line GROQ_KEY ='); return; }
+
+  if(activeMessages.length===0) showChat();
+
+  activeMessages.push({role:'user', content:text});
+  input.value='';
+  renderMessages();
+
+  // IMAGE GENERATION - REAL IMAGES
+  if(isImagePrompt(text)){
+    const idx=activeMessages.push({role:'assistant', content:'🎨 Generating REAL image with Hugging Face... 10-20 sec... 🇸🇸'})-1;
+    renderMessages();
+    try{
+      let prompt = text.replace(/draw|generate image|create image|make image|picture of/gi,'').trim();
+      prompt = prompt + ", ultra realistic, 4k, high detail, photorealistic";
+      let imageUrl = null;
+
+      // Try Hugging Face FLUX
+      if(HF_KEY.includes('hf_')){
+        const res = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',{
+          method:'POST',
+          headers:{'Authorization':`Bearer ${HF_KEY}`,'Content-Type':'application/json'},
+          body:JSON.stringify({inputs:prompt})
+        });
+        if(res.ok){
+          const blob=await res.blob();
+          imageUrl = URL.createObjectURL(blob);
+        }
+      }
+      // Fallback to Pollinations - ALWAYS works, no key, REAL images
+      if(!imageUrl){
+        const seed=Math.floor(Math.random()*999999);
+        imageUrl=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&nologo=true&enhance=true&model=flux`;
+      }
+      activeMessages[idx].content=`IMAGE_URL:${imageUrl}`;
+    }catch(err){
+      const seed=Math.floor(Math.random()*999999);
+      const fallback=`https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?width=1024&height=1024&seed=${seed}&nologo=true&model=flux`;
+      activeMessages[idx].content=`IMAGE_URL:${fallback}`;
+    }
+    renderMessages();
+    saveChats(text);
+    return;
+  }
+
+  // TEXT GENERATION - GROQ
+  const loadingIdx=activeMessages.push({role:'assistant', content:'Thinking... 🇸🇸'})-1;
+  renderMessages();
+  try{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${GROQ_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'system',content:FOUNDER_STORY},...activeMessages.filter(m=>!m.content.startsWith('IMAGE_URL:')&&!m.content.includes('Generating'))],
+        temperature:0.7
+      })
+    });
+    const data=await res.json();
+    if(data.choices){
+      activeMessages[loadingIdx].content=data.choices[0].message.content;
+    } else {
+      activeMessages[loadingIdx].content=`Error: ${data.error?.message||'Groq error - check API key'}`;
+    }
+  }catch(err){
+    activeMessages[loadingIdx].content=`Error: ${err.message} - Check internet`;
+  }
+  renderMessages();
+  saveChats(text);
+}
+
+function saveChats(firstText){
+  const title = firstText.slice(0,40);
+  if(activeChatId){
+    const c=chats.find(c=>c.id===activeChatId);
+    if(c) c.messages=activeMessages;
+  } else {
+    const newId=Date.now().toString();
+    activeChatId=newId;
+    chats.push({id:newId, title:title, messages:activeMessages});
+  }
+  localStorage.setItem('gak_chats', JSON.stringify(chats));
+  renderRecent();
+}
+
+function escapeHtml(t){ return t.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+function formatText(t){ return escapeHtml(t).replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<b>$1</b>'); }
+
+document.addEventListener('DOMContentLoaded',()=>{ renderRecent(); });
+</script>
+</body>
+</html>
