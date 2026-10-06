@@ -112,7 +112,7 @@
 
 <script>
 /* ========= KEYS INSIDE CODE - PASTE HERE ========= */
-const GROQ_KEY = "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"; // Get from https://console.groq.com/keys
+const GROQ_KEY = "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"; // Get from https://console.groq.com/keys
 const HF_KEY = "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"; // Get from https://huggingface.co/settings/tokens (FREE)
 // ==================================================
 
@@ -274,7 +274,7 @@ async function handleSend(e){
       method:'POST',
       headers:{'Authorization':`Bearer ${GROQ_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'llama-3.1-8b-instant',
+         model:'openai/gpt-oss-20b',
         messages:[{role:'system',content:FOUNDER_STORY},...activeMessages.filter(m=>!m.content.startsWith('IMAGE_URL:')&&!m.content.includes('Generating'))],
         temperature:0.7
       })
