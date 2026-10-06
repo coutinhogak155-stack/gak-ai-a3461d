@@ -274,7 +274,7 @@ async function handleSend(e){
       method:'POST',
       headers:{'Authorization':`Bearer ${GROQ_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
+        model:'llama-3.1-8b-instant',
         messages:[{role:'system',content:FOUNDER_STORY},...activeMessages.filter(m=>!m.content.startsWith('IMAGE_URL:')&&!m.content.includes('Generating'))],
         temperature:0.7
       })
